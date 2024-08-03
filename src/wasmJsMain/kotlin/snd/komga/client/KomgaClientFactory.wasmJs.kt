@@ -1,8 +1,5 @@
 package snd.komga.client
 
-import snd.komga.client.sse.KomgaEvent
-import snd.komga.client.sse.KomgaSSESession
-import snd.komga.client.sse.toKomgaEvent
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -11,6 +8,9 @@ import kotlinx.serialization.json.Json
 import org.w3c.dom.EventSource
 import org.w3c.dom.EventSourceInit
 import org.w3c.dom.MessageEvent
+import snd.komga.client.sse.KomgaEvent
+import snd.komga.client.sse.KomgaSSESession
+import snd.komga.client.sse.toKomgaEvent
 
 internal actual suspend fun getSseSession(json: Json, baseUrl: String, authCookie: String): KomgaSSESession {
     return JsKomgaSseSession(json, baseUrl)
@@ -21,7 +21,7 @@ class JsKomgaSseSession(
     baseUrl: String,
 ) : KomgaSSESession {
     private val scope = CoroutineScope(Dispatchers.Default)
-    override val incoming: MutableSharedFlow<KomgaEvent> = MutableSharedFlow()
+    override val incoming = MutableSharedFlow<KomgaEvent>(extraBufferCapacity = 100)
     private val eventSource: EventSource
 
     init {

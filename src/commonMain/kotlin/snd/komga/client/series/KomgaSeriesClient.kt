@@ -1,5 +1,10 @@
 package snd.komga.client.series
 
+import io.ktor.client.*
+import io.ktor.client.call.*
+import io.ktor.client.request.*
+import io.ktor.client.request.forms.*
+import io.ktor.http.*
 import snd.komga.client.book.KomgaBook
 import snd.komga.client.book.KomgaMediaStatus
 import snd.komga.client.book.KomgaReadStatus
@@ -10,14 +15,8 @@ import snd.komga.client.common.KomgaThumbnailId
 import snd.komga.client.common.Page
 import snd.komga.client.common.toParams
 import snd.komga.client.library.KomgaLibraryId
-import io.ktor.client.*
-import io.ktor.client.call.*
-import io.ktor.client.request.*
-import io.ktor.client.request.forms.*
-import io.ktor.http.*
 
 class KomgaSeriesClient(private val ktor: HttpClient) {
-
 
     suspend fun getOneSeries(seriesId: KomgaSeriesId): KomgaSeries {
         return ktor.get("api/v1/series/$seriesId").body()
@@ -164,6 +163,10 @@ class KomgaSeriesClient(private val ktor: HttpClient) {
             contentType(ContentType.Application.Json)
             setBody(request)
         }
+    }
+
+    suspend fun getSeriesDefaultThumbnail(seriesId: KomgaSeriesId): ByteArray {
+        return ktor.get("api/v1/series/$seriesId/thumbnail").body()
     }
 
     suspend fun getSeriesThumbnails(seriesId: KomgaSeriesId): List<KomgaSeriesThumbnail> {

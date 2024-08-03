@@ -1,14 +1,13 @@
-
 package snd.komga.client.book
 
+import kotlinx.datetime.Instant
+import kotlinx.datetime.LocalDate
+import kotlinx.serialization.Serializable
 import snd.komga.client.common.KomgaAuthor
 import snd.komga.client.common.KomgaThumbnailId
 import snd.komga.client.common.KomgaWebLink
 import snd.komga.client.library.KomgaLibraryId
 import snd.komga.client.series.KomgaSeriesId
-import kotlinx.datetime.Instant
-import kotlinx.datetime.LocalDate
-import kotlinx.serialization.Serializable
 import kotlin.jvm.JvmInline
 
 
@@ -37,6 +36,7 @@ data class KomgaBook(
     val readProgress: ReadProgress?,
     val deleted: Boolean,
     val fileHash: String,
+    val oneshot: Boolean,
 )
 
 @Serializable

@@ -4,7 +4,6 @@ import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.targets.js.dsl.ExperimentalWasmDsl
 import org.jetbrains.kotlin.gradle.targets.js.webpack.KotlinWebpackConfig
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
     kotlin("multiplatform")
@@ -12,9 +11,9 @@ plugins {
     id("com.android.library")
 }
 
-group = "io.github.Snd-R"
+group = "io.github.snd-r"
 version = "0.1"
-val ktorVersion = "3.0.0-beta-2-eap-972"
+val ktorVersion = "3.0.0-beta-2-eap-992"
 
 kotlin {
     jvmToolchain(17)

@@ -1,17 +1,17 @@
 package snd.komga.client.book
 
-import snd.komga.client.common.KomgaPageRequest
-import snd.komga.client.common.KomgaThumbnailId
-import snd.komga.client.common.Page
-import snd.komga.client.common.toParams
-import snd.komga.client.library.KomgaLibraryId
-import snd.komga.client.readlist.KomgaReadList
 import io.ktor.client.*
 import io.ktor.client.call.*
 import io.ktor.client.request.*
 import io.ktor.client.request.forms.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
+import snd.komga.client.common.KomgaPageRequest
+import snd.komga.client.common.KomgaThumbnailId
+import snd.komga.client.common.Page
+import snd.komga.client.common.toParams
+import snd.komga.client.library.KomgaLibraryId
+import snd.komga.client.readlist.KomgaReadList
 
 
 class KomgaBookClient(private val ktor: HttpClient) {
@@ -119,6 +119,10 @@ class KomgaBookClient(private val ktor: HttpClient) {
         ktor.put("/api/v1/books/thumbnails") {
             parameter("for_bigger_result_only", forBiggerResultOnly)
         }
+    }
+
+    suspend fun getBookThumbnail(bookId: KomgaBookId): ByteArray {
+        return ktor.get("api/v1/books/$bookId/thumbnail").body()
     }
 
     suspend fun getBookThumbnails(bookId: KomgaBookId): List<KomgaBookThumbnail> {

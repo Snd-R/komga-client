@@ -1,8 +1,5 @@
 package snd.komga.client
 
-import snd.komga.client.sse.KomgaEvent
-import snd.komga.client.sse.KomgaSSESession
-import snd.komga.client.sse.toKomgaEvent
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.cancel
@@ -20,6 +17,9 @@ import okhttp3.sse.EventSource
 import okhttp3.sse.EventSourceListener
 import okhttp3.sse.EventSources
 import okio.withLock
+import snd.komga.client.sse.KomgaEvent
+import snd.komga.client.sse.KomgaSSESession
+import snd.komga.client.sse.toKomgaEvent
 import java.util.concurrent.locks.ReentrantLock
 
 internal actual suspend fun getSseSession(json: Json, baseUrl: String, authCookie: String): KomgaSSESession {
@@ -38,7 +38,7 @@ class OkHttpKomgaSseSession(
     private val authCookie: String,
 ) : KomgaSSESession, EventSourceListener() {
     private val scope = CoroutineScope(Dispatchers.IO)
-    override val incoming = MutableSharedFlow<KomgaEvent>()
+    override val incoming = MutableSharedFlow<KomgaEvent>(extraBufferCapacity = 100)
     private var serverSentEventsSource: EventSource? = null
     private val connectionLock = ReentrantLock()
     private var isActive: Boolean = false
