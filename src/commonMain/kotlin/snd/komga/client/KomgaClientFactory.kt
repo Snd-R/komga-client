@@ -1,5 +1,14 @@
 package snd.komga.client
 
+import io.ktor.client.*
+import io.ktor.client.plugins.*
+import io.ktor.client.plugins.auth.*
+import io.ktor.client.plugins.auth.providers.*
+import io.ktor.client.plugins.contentnegotiation.*
+import io.ktor.client.plugins.cookies.*
+import io.ktor.http.*
+import io.ktor.serialization.kotlinx.json.*
+import kotlinx.serialization.json.Json
 import snd.komga.client.actuator.KomgaActuatorClient
 import snd.komga.client.announcements.KomgaAnnouncementsClient
 import snd.komga.client.book.KomgaBookClient
@@ -13,15 +22,6 @@ import snd.komga.client.settings.KomgaSettingsClient
 import snd.komga.client.sse.KomgaSSESession
 import snd.komga.client.task.KomgaTaskClient
 import snd.komga.client.user.KomgaUserClient
-import io.ktor.client.*
-import io.ktor.client.plugins.*
-import io.ktor.client.plugins.auth.*
-import io.ktor.client.plugins.auth.providers.*
-import io.ktor.client.plugins.contentnegotiation.*
-import io.ktor.client.plugins.cookies.*
-import io.ktor.http.*
-import io.ktor.serialization.kotlinx.json.*
-import kotlinx.serialization.json.Json
 
 class KomgaClientFactory private constructor(
     private val builder: Builder
@@ -47,6 +47,7 @@ class KomgaClientFactory private constructor(
 
             val username = builder.username
             val password = builder.password
+            val useragent = builder.useragent
             if (username != null && password != null) {
                 install(Auth) {
                     basic {
@@ -55,6 +56,11 @@ class KomgaClientFactory private constructor(
                     }
                 }
             }
+
+            if (useragent != null) {
+                install(UserAgent) { agent = useragent }
+            }
+
             expectSuccess = true
         }
     }
@@ -81,8 +87,18 @@ class KomgaClientFactory private constructor(
         val authCookie = ktor.cookies(Url(baseUrl()))
             .find { it.name == "SESSION" }
             ?.let { renderCookieHeader(it) }
-            ?: ""
-        return getSseSession(json, baseUrl(), authCookie)
+        if (authCookie == null && builder.username == null && builder.password == null) {
+            throw IllegalStateException("No session cookie is found and no username and password credentials are provided")
+        }
+
+        return getSseSession(
+            json = json,
+            baseUrl = baseUrl(),
+            username = builder.username,
+            password = builder.password,
+            useragent = builder.useragent,
+            authCookie = authCookie
+        )
     }
 
     class Builder {
@@ -93,6 +109,7 @@ class KomgaClientFactory private constructor(
 
         internal var username: String? = null
         internal var password: String? = null
+        internal var useragent: String? = null
 
         fun ktor(ktor: HttpClient) = apply {
             this.ktor = ktor
@@ -110,6 +127,10 @@ class KomgaClientFactory private constructor(
             this.username = username
         }
 
+        fun useragent(useragent: String) = apply {
+            this.useragent = useragent
+        }
+
         fun password(password: String) = apply {
             this.password = password
         }
@@ -121,4 +142,11 @@ class KomgaClientFactory private constructor(
     }
 }
 
-internal expect suspend fun getSseSession(json: Json, baseUrl: String, authCookie: String): KomgaSSESession
+internal expect suspend fun getSseSession(
+    json: Json,
+    baseUrl: String,
+    username: String?,
+    password: String?,
+    useragent: String?,
+    authCookie: String?
+): KomgaSSESession

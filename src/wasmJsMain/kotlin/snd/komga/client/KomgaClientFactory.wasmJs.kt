@@ -12,7 +12,14 @@ import snd.komga.client.sse.KomgaEvent
 import snd.komga.client.sse.KomgaSSESession
 import snd.komga.client.sse.toKomgaEvent
 
-internal actual suspend fun getSseSession(json: Json, baseUrl: String, authCookie: String): KomgaSSESession {
+internal actual suspend fun getSseSession(
+    json: Json,
+    baseUrl: String,
+    username: String?,
+    password: String?,
+    useragent: String?,
+    authCookie: String?
+): KomgaSSESession {
     return JsKomgaSseSession(json, baseUrl)
 }
 
