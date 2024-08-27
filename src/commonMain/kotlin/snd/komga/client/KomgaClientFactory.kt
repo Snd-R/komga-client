@@ -81,15 +81,9 @@ class KomgaClientFactory private constructor(
     //FIXME ktor sse session implementation does NOT terminate sse connection on session context cancellation
     // using custom implementation as a workaround
     suspend fun sseSession(): KomgaSSESession {
-//        val session = ktorSse.sseSession("sse/v1/events")
-//        return KtorKomgaSSESession(json, session)
-
         val authCookie = ktor.cookies(Url(baseUrl()))
             .find { it.name == "SESSION" }
             ?.let { renderCookieHeader(it) }
-        if (authCookie == null && builder.username == null && builder.password == null) {
-            throw IllegalStateException("No session cookie is found and no username and password credentials are provided")
-        }
 
         return getSseSession(
             json = json,

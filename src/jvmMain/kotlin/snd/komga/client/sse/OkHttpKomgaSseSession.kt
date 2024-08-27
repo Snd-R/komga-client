@@ -1,8 +1,11 @@
 package snd.komga.client.sse
 
 import io.github.oshai.kotlinlogging.KotlinLogging
+import io.ktor.http.*
+import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -30,7 +33,8 @@ class OkHttpKomgaSseSession(
     private val authCookie: String?,
     private val useragent: String?,
 ) : KomgaSSESession, EventSourceListener() {
-    private val scope = CoroutineScope(Dispatchers.IO)
+    private val scope = CoroutineScope(Dispatchers.IO + SupervisorJob() +
+            CoroutineExceptionHandler { _, exception -> logger.catching(exception) })
     override val incoming = MutableSharedFlow<KomgaEvent>(extraBufferCapacity = 100)
     private var serverSentEventsSource: EventSource? = null
     private val connectionLock = ReentrantLock()
@@ -49,7 +53,8 @@ class OkHttpKomgaSseSession(
 
     override fun onFailure(eventSource: EventSource, t: Throwable?, response: Response?) {
         if (isActive) {
-            logger.warn(t) { "Event source error" }
+            val responseCode = response?.code?.let { HttpStatusCode.fromValue(it) }?.toString()
+            logger.warn(t) { "Event source error; response code $responseCode" }
             reconnect()
         }
     }
@@ -61,7 +66,6 @@ class OkHttpKomgaSseSession(
 
                 connectionLock.withLock {
                     if (isActive) {
-                        logger.warn { "Attempting to reconnect" }
                         serverSentEventsSource?.cancel()
                         serverSentEventsSource = getSseConnection()
                     }

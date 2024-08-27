@@ -1,6 +1,7 @@
 package snd.komga.client.sse
 
 import io.github.oshai.kotlinlogging.KotlinLogging
+import io.ktor.http.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.cancel
@@ -49,7 +50,8 @@ class OkHttpKomgaSseSession(
 
     override fun onFailure(eventSource: EventSource, t: Throwable?, response: Response?) {
         if (isActive) {
-            logger.warn(t) { "Event source error" }
+            val responseCode = response?.code?.let { HttpStatusCode.fromValue(it) }?.toString()
+            logger.warn(t) { "Event source error; response code $responseCode" }
             reconnect()
         }
     }
@@ -61,7 +63,6 @@ class OkHttpKomgaSseSession(
 
                 connectionLock.withLock {
                     if (isActive) {
-                        logger.warn { "Attempting to reconnect" }
                         serverSentEventsSource?.cancel()
                         serverSentEventsSource = getSseConnection()
                     }
