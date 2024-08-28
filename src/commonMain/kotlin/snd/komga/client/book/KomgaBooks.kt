@@ -84,7 +84,15 @@ data class Media(
     val mediaType: String,
     val pagesCount: Int,
     val comment: String,
+    val mediaProfile: MediaProfile,
+    val epubDivinaCompatible: Boolean
 )
+
+enum class MediaProfile {
+    DIVINA,
+    PDF,
+    EPUB,
+}
 
 @Serializable
 data class ReadProgress(
