@@ -1,30 +1,29 @@
 @file:OptIn(ExperimentalKotlinGradlePluginApi::class)
 
-import com.vanniktech.maven.publish.JavadocJar
-import com.vanniktech.maven.publish.KotlinMultiplatform
 import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
-import org.jetbrains.kotlin.gradle.targets.js.dsl.ExperimentalWasmDsl
 
 plugins {
     alias(libs.plugins.androidLibrary)
     alias(libs.plugins.kotlinMultiplatform)
     alias(libs.plugins.kotlinSerialization)
     alias(libs.plugins.mavenPublish)
+    signing
 }
 
 group = "io.github.snd-r"
-version = "0.1.0-SNAPSHOT"
+version = "0.1.0"
 
 kotlin {
     jvmToolchain(17)
     androidTarget {
         compilerOptions { jvmTarget.set(JvmTarget.JVM_17) }
+        publishLibraryVariants("release")
     }
     jvm {
         compilerOptions { jvmTarget.set(JvmTarget.JVM_17) }
     }
-    @OptIn(ExperimentalWasmDsl::class)
+    @OptIn(org.jetbrains.kotlin.gradle.ExperimentalWasmDsl::class)
     wasmJs {
         moduleName = "komga-client"
         browser()
@@ -69,12 +68,7 @@ android {
     }
 
 }
-mavenPublishing {
-    configure(
-        KotlinMultiplatform(
-            javadocJar = JavadocJar.Empty(),
-            sourcesJar = true,
-            androidVariantsToPublish = listOf("debug", "release"),
-        )
-    )
+
+signing {
+    useGpgCmd()
 }
