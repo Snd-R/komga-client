@@ -29,6 +29,7 @@ data class KomgaSeries(
     val booksInProgressCount: Int,
     val metadata: KomgaSeriesMetadata,
     val deleted: Boolean,
+    val oneshot: Boolean,
     val booksMetadata: KomgaSeriesBookMetadata,
 )
 
