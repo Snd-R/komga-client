@@ -166,7 +166,9 @@ class KomgaSeriesClient(private val ktor: HttpClient) {
     }
 
     suspend fun getSeriesDefaultThumbnail(seriesId: KomgaSeriesId): ByteArray {
-        return ktor.get("api/v1/series/$seriesId/thumbnail").body()
+        return ktor.get("api/v1/series/$seriesId/thumbnail"){
+            accept(ContentType.Any)
+        }.body()
     }
 
     suspend fun getSeriesThumbnails(seriesId: KomgaSeriesId): List<KomgaSeriesThumbnail> {

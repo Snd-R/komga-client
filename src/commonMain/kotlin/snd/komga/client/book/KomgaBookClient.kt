@@ -122,7 +122,9 @@ class KomgaBookClient(private val ktor: HttpClient) {
     }
 
     suspend fun getBookThumbnail(bookId: KomgaBookId): ByteArray {
-        return ktor.get("api/v1/books/$bookId/thumbnail").body()
+        return ktor.get("api/v1/books/$bookId/thumbnail"){
+            accept(ContentType.Any)
+        }.body()
     }
 
     suspend fun getBookThumbnails(bookId: KomgaBookId): List<KomgaBookThumbnail> {

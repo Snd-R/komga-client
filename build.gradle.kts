@@ -12,7 +12,7 @@ plugins {
 }
 
 group = "io.github.snd-r"
-version = "0.2.0"
+version = "0.3.0"
 
 kotlin {
     jvmToolchain(17)
