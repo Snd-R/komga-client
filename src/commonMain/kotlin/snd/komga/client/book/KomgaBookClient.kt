@@ -116,7 +116,7 @@ class KomgaBookClient(private val ktor: HttpClient) {
     }
 
     suspend fun regenerateThumbnails(forBiggerResultOnly: Boolean) {
-        ktor.put("/api/v1/books/thumbnails") {
+        ktor.put("api/v1/books/thumbnails") {
             parameter("for_bigger_result_only", forBiggerResultOnly)
         }
     }

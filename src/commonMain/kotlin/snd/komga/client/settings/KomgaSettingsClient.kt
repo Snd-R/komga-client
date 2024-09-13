@@ -8,11 +8,11 @@ import io.ktor.http.*
 class KomgaSettingsClient internal constructor(private val ktor: HttpClient) {
 
     suspend fun getSettings(): KomgaSettings {
-        return ktor.get("/api/v1/settings").body()
+        return ktor.get("api/v1/settings").body()
     }
 
     suspend fun updateSettings(request: KomgaSettingsUpdateRequest) {
-        ktor.patch("/api/v1/settings") {
+        ktor.patch("api/v1/settings") {
             contentType(ContentType.Application.Json)
             setBody(request)
         }
