@@ -31,7 +31,8 @@ class OkHttpKomgaSseSession(
     private val authCookie: String?,
     private val useragent: String?,
 ) : KomgaSSESession, EventSourceListener() {
-    private val scope = CoroutineScope(Dispatchers.IO)
+    private val scope = CoroutineScope(Dispatchers.IO + SupervisorJob() +
+            CoroutineExceptionHandler { _, exception -> logger.catching(exception) })
     override val incoming = MutableSharedFlow<KomgaEvent>(extraBufferCapacity = 100)
     private var serverSentEventsSource: EventSource? = null
     private val connectionLock = ReentrantLock()
@@ -45,29 +46,34 @@ class OkHttpKomgaSseSession(
     }
 
     override fun onEvent(eventSource: EventSource, id: String?, type: String?, data: String) {
-        scope.launch { incoming.emit(json.toKomgaEvent(type, data)) }
+        incoming.tryEmit(json.toKomgaEvent(type, data))
     }
 
     override fun onFailure(eventSource: EventSource, t: Throwable?, response: Response?) {
         if (isActive) {
-            val responseCode = response?.code?.let { HttpStatusCode.fromValue(it) }?.toString()
-            logger.warn(t) { "Event source error; response code $responseCode" }
-            reconnect()
+            scope.launch {
+                val responseCode = response?.code?.let { HttpStatusCode.fromValue(it) }?.toString()
+                logger.warn(t) { "Event source error; response code $responseCode" }
+                delay(10000)
+                reconnect()
+            }
         }
     }
 
+    override fun onClosed(eventSource: EventSource) {
+        logger.debug { "Komga event source closed" }
+        scope.launch { reconnect() }
+    }
+
+    override fun onOpen(eventSource: EventSource, response: Response) {
+        logger.info { "connected to Komga event source: ${baseUrl.newBuilder().addPathSegments("sse/v1/events")}" }
+    }
+
     private fun reconnect() {
-        scope.launch {
+        connectionLock.withLock {
             if (isActive) {
-                delay(10000)
-
-                connectionLock.withLock {
-                    if (isActive) {
-                        serverSentEventsSource?.cancel()
-                        serverSentEventsSource = getSseConnection()
-                    }
-                }
-
+                serverSentEventsSource?.cancel()
+                serverSentEventsSource = getSseConnection()
             }
         }
     }

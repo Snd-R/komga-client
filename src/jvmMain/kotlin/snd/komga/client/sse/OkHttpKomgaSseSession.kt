@@ -48,30 +48,34 @@ class OkHttpKomgaSseSession(
     }
 
     override fun onEvent(eventSource: EventSource, id: String?, type: String?, data: String) {
-        scope.launch { incoming.emit(json.toKomgaEvent(type, data)) }
+        incoming.tryEmit(json.toKomgaEvent(type, data))
     }
 
     override fun onFailure(eventSource: EventSource, t: Throwable?, response: Response?) {
         if (isActive) {
-            val responseCode = response?.code?.let { HttpStatusCode.fromValue(it) }?.toString()
-            logger.warn(t) { "Event source error; response code $responseCode" }
-            reconnect()
+            scope.launch {
+                val responseCode = response?.code?.let { HttpStatusCode.fromValue(it) }?.toString()
+                logger.warn(t) { "Event source error; response code $responseCode" }
+                delay(10000)
+                reconnect()
+            }
         }
     }
 
+    override fun onClosed(eventSource: EventSource) {
+        logger.debug { "Komga event source closed" }
+        scope.launch { reconnect() }
+    }
+
+    override fun onOpen(eventSource: EventSource, response: Response) {
+        logger.info { "connected to Komga event source: ${baseUrl.newBuilder().addPathSegments("sse/v1/events")}" }
+    }
+
     private fun reconnect() {
-        scope.launch {
+        connectionLock.withLock {
             if (isActive) {
-                delay(10000)
-                logger.warn { "attempting to reconnect to event source" }
-
-                connectionLock.withLock {
-                    if (isActive) {
-                        serverSentEventsSource?.cancel()
-                        serverSentEventsSource = getSseConnection()
-                    }
-                }
-
+                serverSentEventsSource?.cancel()
+                serverSentEventsSource = getSseConnection()
             }
         }
     }
