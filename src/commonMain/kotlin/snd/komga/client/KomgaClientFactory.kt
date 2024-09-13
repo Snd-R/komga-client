@@ -32,7 +32,7 @@ class KomgaClientFactory private constructor(
         encodeDefaults = false
     }
 
-    private val baseUrl: () -> String = builder.baseUrl
+    private val baseUrl: () -> URLBuilder = builder.baseUrl
     private val ktor: HttpClient = configureKtor(builder.ktor ?: HttpClient())
 
     private fun configureKtor(client: HttpClient): HttpClient {
@@ -43,7 +43,7 @@ class KomgaClientFactory private constructor(
             }
 
             install(ContentNegotiation) { json(json) }
-            defaultRequest { url(baseUrl()) }
+            defaultRequest { url { this.takeFrom(baseUrl()) } }
 
             val username = builder.username
             val password = builder.password
@@ -87,7 +87,7 @@ class KomgaClientFactory private constructor(
 
         return getSseSession(
             json = json,
-            baseUrl = baseUrl(),
+            baseUrl = baseUrl().buildString(),
             username = builder.username,
             password = builder.password,
             useragent = builder.useragent,
@@ -97,7 +97,7 @@ class KomgaClientFactory private constructor(
 
     class Builder {
         internal var ktor: HttpClient? = null
-        internal var baseUrl: () -> String = { "http://localhost:25600/" }
+        internal var baseUrl: () -> URLBuilder = { URLBuilder("http://localhost:25600/") }
         internal var cookieStorage: CookiesStorage? = null
         internal var json: Json = Json
 
@@ -110,6 +110,10 @@ class KomgaClientFactory private constructor(
         }
 
         fun baseUrl(block: () -> String) = apply {
+            this.baseUrl = { URLBuilder(block()) }
+        }
+
+        fun baseUrlBuilder(block: () -> URLBuilder) = apply {
             this.baseUrl = block
         }
 

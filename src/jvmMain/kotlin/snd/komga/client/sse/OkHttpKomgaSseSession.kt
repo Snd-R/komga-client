@@ -63,6 +63,7 @@ class OkHttpKomgaSseSession(
         scope.launch {
             if (isActive) {
                 delay(10000)
+                logger.warn { "attempting to reconnect to event source" }
 
                 connectionLock.withLock {
                     if (isActive) {
