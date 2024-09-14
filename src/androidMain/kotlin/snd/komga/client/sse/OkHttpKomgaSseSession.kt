@@ -2,8 +2,10 @@ package snd.komga.client.sse
 
 import io.github.oshai.kotlinlogging.KotlinLogging
 import io.ktor.http.*
+import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
