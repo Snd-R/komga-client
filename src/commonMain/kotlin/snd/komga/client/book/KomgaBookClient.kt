@@ -1,172 +1,51 @@
 package snd.komga.client.book
 
-import io.ktor.client.*
-import io.ktor.client.call.*
-import io.ktor.client.request.*
-import io.ktor.client.request.forms.*
 import io.ktor.client.statement.*
-import io.ktor.http.*
+import snd.komga.client.book.KomgaBook
+import snd.komga.client.book.KomgaBookId
+import snd.komga.client.book.KomgaBookMetadataUpdateRequest
+import snd.komga.client.book.KomgaBookPage
+import snd.komga.client.book.KomgaBookQuery
+import snd.komga.client.book.KomgaBookReadProgressUpdateRequest
+import snd.komga.client.book.KomgaBookThumbnail
 import snd.komga.client.common.KomgaPageRequest
 import snd.komga.client.common.KomgaThumbnailId
 import snd.komga.client.common.Page
-import snd.komga.client.common.toParams
 import snd.komga.client.library.KomgaLibraryId
 import snd.komga.client.readlist.KomgaReadList
 
-
-class KomgaBookClient(private val ktor: HttpClient) {
-
-    suspend fun getBook(bookId: KomgaBookId): KomgaBook {
-        return ktor.get("api/v1/books/$bookId").body()
-    }
-
-    suspend fun getAllBooks(
-        query: KomgaBookQuery? = null,
-        pageRequest: KomgaPageRequest? = null,
-    ): Page<KomgaBook> {
-        val params = ParametersBuilder().apply {
-            query?.searchTerm?.let { append("search", it) }
-            query?.libraryIds?.let { if (it.isNotEmpty()) append("library_id", it.joinToString(",")) }
-            query?.mediaStatus?.let { append("media_status", it.joinToString(",")) }
-            query?.readStatus?.let { append("read_status", it.joinToString(",")) }
-            query?.releasedAfter?.let { append("released_after", it.toString()) }
-            query?.tags?.let { append("tag", it.joinToString(",")) }
-            pageRequest?.let { appendAll(it.toParams()) }
-        }.build()
-
-        return ktor.get {
-            url {
-                path("api/v1/books")
-                parameters.appendAll(params)
-            }
-        }.body()
-    }
-
-    suspend fun getLatestBooks(pageRequest: KomgaPageRequest? = null): Page<KomgaBook> {
-        return ktor.get {
-            url {
-                path("api/v1/books/latest")
-                pageRequest?.let { parameters.appendAll(it.toParams()) }
-            }
-        }.body()
-    }
-
+interface KomgaBookClient {
+    suspend fun getBook(bookId: KomgaBookId): KomgaBook
+    suspend fun getAllBooks(query: KomgaBookQuery? = null, pageRequest: KomgaPageRequest? = null): Page<KomgaBook>
+    suspend fun getLatestBooks(pageRequest: KomgaPageRequest? = null): Page<KomgaBook>
     suspend fun getBooksOnDeck(
         libraryIds: List<KomgaLibraryId>? = null,
         pageRequest: KomgaPageRequest? = null,
-    ): Page<KomgaBook> {
-        return ktor.get {
-            url {
-                path("api/v1/books/ondeck")
-                pageRequest?.let { parameters.appendAll(it.toParams()) }
-                libraryIds?.let { parameters.append("library_id", it.joinToString()) }
-            }
-        }.body()
-    }
+    ): Page<KomgaBook>
 
-    suspend fun getDuplicateBooks(pageRequest: KomgaPageRequest? = null): Page<KomgaBook> {
-        return ktor.get {
-            url {
-                path("api/v1/books/duplicates")
-                pageRequest?.let { parameters.appendAll(it.toParams()) }
-            }
-        }.body()
-    }
-
-    suspend fun getBookSiblingPrevious(bookId: KomgaBookId): KomgaBook {
-        return ktor.get("api/v1/books/$bookId/previous").body()
-    }
-
-    suspend fun getBookSiblingNext(bookId: KomgaBookId): KomgaBook {
-        return ktor.get("api/v1/books/$bookId/next").body()
-    }
-
-    suspend fun updateMetadata(bookId: KomgaBookId, request: KomgaBookMetadataUpdateRequest) {
-        ktor.patch("api/v1/books/$bookId/metadata") {
-            contentType(ContentType.Application.Json)
-            setBody(request)
-        }
-    }
-
-    suspend fun getBookPages(bookId: KomgaBookId): List<KomgaBookPage> {
-        return ktor.get("api/v1/books/$bookId/pages").body()
-    }
-
-    suspend fun analyze(bookId: KomgaBookId) {
-        ktor.post("api/v1/books/$bookId/analyze")
-    }
-
-    suspend fun refreshMetadata(bookId: KomgaBookId) {
-        ktor.post("api/v1/books/$bookId/metadata/refresh")
-    }
-
-    suspend fun markReadProgress(bookId: KomgaBookId, request: KomgaBookReadProgressUpdateRequest) {
-        ktor.patch("api/v1/books/$bookId/read-progress") {
-            contentType(ContentType.Application.Json)
-            setBody(request)
-        }
-    }
-
-    suspend fun deleteReadProgress(bookId: KomgaBookId) {
-        ktor.delete("api/v1/books/$bookId/read-progress")
-    }
-
-    suspend fun deleteBook(bookId: KomgaBookId) {
-        ktor.delete("api/v1/books/$bookId/file")
-    }
-
-    suspend fun regenerateThumbnails(forBiggerResultOnly: Boolean) {
-        ktor.put("api/v1/books/thumbnails") {
-            parameter("for_bigger_result_only", forBiggerResultOnly)
-        }
-    }
-
-    suspend fun getBookThumbnail(bookId: KomgaBookId): ByteArray {
-        return ktor.get("api/v1/books/$bookId/thumbnail"){
-            accept(ContentType.Any)
-        }.body()
-    }
-
-    suspend fun getBookThumbnails(bookId: KomgaBookId): List<KomgaBookThumbnail> {
-        return ktor.get("api/v1/books/$bookId/thumbnails").body()
-    }
-
+    suspend fun getDuplicateBooks(pageRequest: KomgaPageRequest? = null): Page<KomgaBook>
+    suspend fun getBookSiblingPrevious(bookId: KomgaBookId): KomgaBook
+    suspend fun getBookSiblingNext(bookId: KomgaBookId): KomgaBook
+    suspend fun updateMetadata(bookId: KomgaBookId, request: KomgaBookMetadataUpdateRequest)
+    suspend fun getBookPages(bookId: KomgaBookId): List<KomgaBookPage>
+    suspend fun analyze(bookId: KomgaBookId)
+    suspend fun refreshMetadata(bookId: KomgaBookId)
+    suspend fun markReadProgress(bookId: KomgaBookId, request: KomgaBookReadProgressUpdateRequest)
+    suspend fun deleteReadProgress(bookId: KomgaBookId)
+    suspend fun deleteBook(bookId: KomgaBookId)
+    suspend fun regenerateThumbnails(forBiggerResultOnly: Boolean)
+    suspend fun getBookThumbnail(bookId: KomgaBookId): ByteArray
+    suspend fun getBookThumbnails(bookId: KomgaBookId): List<KomgaBookThumbnail>
     suspend fun uploadBookThumbnail(
         bookId: KomgaBookId,
         file: ByteArray,
         filename: String = "",
         selected: Boolean = true
-    ): KomgaBookThumbnail {
-        return ktor.post("api/v1/books/$bookId/thumbnails") {
-            contentType(ContentType.MultiPart.FormData)
-            setBody(
-                MultiPartFormDataContent(formData {
-                    append("file", file, Headers.build {
-                        append(HttpHeaders.ContentDisposition, "filename=\"$filename\"")
-                    })
-                    append("selected", selected)
-                })
-            )
-        }.body()
-    }
+    ): KomgaBookThumbnail
 
-    suspend fun selectBookThumbnail(bookId: KomgaBookId, thumbnailId: KomgaThumbnailId) {
-        ktor.put("api/v1/books/$bookId/thumbnails/$thumbnailId/selected")
-    }
-
-    suspend fun deleteBookThumbnail(bookId: KomgaBookId, thumbnailId: KomgaThumbnailId) {
-        ktor.delete("api/v1/books/$bookId/thumbnails/$thumbnailId")
-    }
-
-    suspend fun getAllReadListsByBook(bookId: KomgaBookId): List<KomgaReadList> {
-        return ktor.get("api/v1/books/$bookId/readlists").body()
-    }
-
-    suspend fun getBookPage(bookId: KomgaBookId, page: Int): ByteArray {
-        return ktor.get("api/v1/books/${bookId}/pages/$page").body()
-    }
-
-    suspend fun <T> streamBookPage(bookId: KomgaBookId, page: Int, block: suspend (response: HttpResponse) -> T): T {
-        return ktor.prepareGet("api/v1/books/${bookId}/pages/$page").execute { block(it) }
-    }
+    suspend fun selectBookThumbnail(bookId: KomgaBookId, thumbnailId: KomgaThumbnailId)
+    suspend fun deleteBookThumbnail(bookId: KomgaBookId, thumbnailId: KomgaThumbnailId)
+    suspend fun getAllReadListsByBook(bookId: KomgaBookId): List<KomgaReadList>
+    suspend fun getBookPage(bookId: KomgaBookId, page: Int): ByteArray
+    suspend fun <T> streamBookPage(bookId: KomgaBookId, page: Int, block: suspend (response: HttpResponse) -> T): T
 }

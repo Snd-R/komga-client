@@ -9,19 +9,19 @@ import io.ktor.client.plugins.cookies.*
 import io.ktor.http.*
 import io.ktor.serialization.kotlinx.json.*
 import kotlinx.serialization.json.Json
-import snd.komga.client.actuator.KomgaActuatorClient
-import snd.komga.client.announcements.KomgaAnnouncementsClient
-import snd.komga.client.book.KomgaBookClient
-import snd.komga.client.collection.KomgaCollectionClient
-import snd.komga.client.filesystem.KomgaFileSystemClient
-import snd.komga.client.library.KomgaLibraryClient
-import snd.komga.client.readlist.KomgaReadListClient
-import snd.komga.client.referential.KomgaReferentialClient
-import snd.komga.client.series.KomgaSeriesClient
-import snd.komga.client.settings.KomgaSettingsClient
+import snd.komga.client.actuator.HttpActuatorClient
+import snd.komga.client.announcements.HttpAnnouncementsClient
+import snd.komga.client.book.HttpBookClient
+import snd.komga.client.collection.HttpCollectionClient
+import snd.komga.client.filesystem.HttpFileSystemClient
+import snd.komga.client.library.HttpLibraryClient
+import snd.komga.client.readlist.HttpReadListClient
+import snd.komga.client.referential.HttpReferentialClient
+import snd.komga.client.series.HttpSeriesClient
+import snd.komga.client.settings.HttpSettingsClient
 import snd.komga.client.sse.KomgaSSESession
-import snd.komga.client.task.KomgaTaskClient
-import snd.komga.client.user.KomgaUserClient
+import snd.komga.client.task.HttpTaskClient
+import snd.komga.client.user.HttpUserClient
 
 class KomgaClientFactory private constructor(
     private val builder: Builder
@@ -65,18 +65,18 @@ class KomgaClientFactory private constructor(
         }
     }
 
-    fun libraryClient() = KomgaLibraryClient(ktor)
-    fun seriesClient() = KomgaSeriesClient(ktor)
-    fun bookClient() = KomgaBookClient(ktor)
-    fun userClient() = KomgaUserClient(ktor)
-    fun fileSystemClient() = KomgaFileSystemClient(ktor)
-    fun settingsClient() = KomgaSettingsClient(ktor)
-    fun taskClient() = KomgaTaskClient(ktor)
-    fun actuatorClient() = KomgaActuatorClient(ktor)
-    fun announcementClient() = KomgaAnnouncementsClient(ktor)
-    fun collectionClient() = KomgaCollectionClient(ktor)
-    fun readListClient() = KomgaReadListClient(ktor)
-    fun referentialClient() = KomgaReferentialClient(ktor)
+    fun libraryClient() = HttpLibraryClient(ktor)
+    fun seriesClient() = HttpSeriesClient(ktor)
+    fun bookClient() = HttpBookClient(ktor)
+    fun userClient() = HttpUserClient(ktor)
+    fun fileSystemClient() = HttpFileSystemClient(ktor)
+    fun settingsClient() = HttpSettingsClient(ktor)
+    fun taskClient() = HttpTaskClient(ktor)
+    fun actuatorClient() = HttpActuatorClient(ktor)
+    fun announcementClient() = HttpAnnouncementsClient(ktor)
+    fun collectionClient() = HttpCollectionClient(ktor)
+    fun readListClient() = HttpReadListClient(ktor)
+    fun referentialClient() = HttpReferentialClient(ktor)
 
     //FIXME ktor sse session implementation does NOT terminate sse connection on session context cancellation
     // using custom implementation as a workaround

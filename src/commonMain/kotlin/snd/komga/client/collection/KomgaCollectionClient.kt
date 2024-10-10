@@ -1,111 +1,49 @@
 package snd.komga.client.collection
 
+import snd.komga.client.collection.KomgaCollection
+import snd.komga.client.collection.KomgaCollectionCreateRequest
+import snd.komga.client.collection.KomgaCollectionId
+import snd.komga.client.collection.KomgaCollectionQuery
+import snd.komga.client.collection.KomgaCollectionThumbnail
+import snd.komga.client.collection.KomgaCollectionUpdateRequest
 import snd.komga.client.common.KomgaPageRequest
 import snd.komga.client.common.KomgaThumbnailId
 import snd.komga.client.common.Page
-import snd.komga.client.common.toParams
 import snd.komga.client.library.KomgaLibraryId
 import snd.komga.client.series.KomgaSeries
-import io.ktor.client.*
-import io.ktor.client.call.*
-import io.ktor.client.request.*
-import io.ktor.client.request.forms.*
-import io.ktor.http.*
 
-class KomgaCollectionClient internal constructor(private val ktor: HttpClient) {
+interface KomgaCollectionClient {
 
     suspend fun getAll(
         search: String? = null,
         libraryIds: List<KomgaLibraryId>? = null,
         pageRequest: KomgaPageRequest? = null,
-    ): Page<KomgaCollection> {
-        return ktor.get("api/v1/collections") {
-            url.parameters.apply {
-                search?.let { append("search", it) }
-                libraryIds?.let { ids -> if (ids.isNotEmpty()) append("library_id", ids.joinToString()) }
-                pageRequest?.let { appendAll(it.toParams()) }
-            }
-        }.body()
-    }
+    ): Page<KomgaCollection>
 
-    suspend fun getOne(id: KomgaCollectionId): KomgaCollection {
-        return ktor.get("api/v1/collections/$id").body()
-    }
+    suspend fun getOne(id: KomgaCollectionId): KomgaCollection
 
-    suspend fun addOne(request: KomgaCollectionCreateRequest): KomgaCollection {
-        return ktor.post("api/v1/collections") {
-            contentType(ContentType.Application.Json)
-            setBody(request)
-        }.body()
-    }
+    suspend fun addOne(request: KomgaCollectionCreateRequest): KomgaCollection
 
-    suspend fun updateOne(id: KomgaCollectionId, request: KomgaCollectionUpdateRequest) {
-        ktor.patch("api/v1/collections/$id") {
-            contentType(ContentType.Application.Json)
-            setBody(request)
-        }
-    }
+    suspend fun updateOne(id: KomgaCollectionId, request: KomgaCollectionUpdateRequest)
 
-    suspend fun deleteOne(id: KomgaCollectionId) {
-        ktor.delete("api/v1/collections/$id")
-    }
+    suspend fun deleteOne(id: KomgaCollectionId)
 
     suspend fun getSeriesForCollection(
         id: KomgaCollectionId,
         query: KomgaCollectionQuery? = null,
         pageRequest: KomgaPageRequest? = null,
-    ): Page<KomgaSeries> {
-        return ktor.get("api/v1/collections/$id/series") {
-            url.parameters.apply {
-                query?.libraryIds?.let { append("library_id", it.joinToString()) }
-                query?.readStatus?.let { append("read_status", it.joinToString()) }
-                query?.status?.let { append("status", it.joinToString()) }
-                query?.languages?.let { append("language", it.joinToString()) }
-                query?.publishers?.let { append("publisher", it.joinToString()) }
-                query?.tags?.let { append("tag", it.joinToString()) }
-                query?.genres?.let { append("genre", it.joinToString()) }
-                query?.ageRatings?.let { append("age_rating", it.joinToString()) }
-                query?.releaseYears?.let { append("release_year", it.joinToString()) }
-                query?.authors?.let { authors ->
-                    append("authors", authors.joinToString { "${it.name},${it.role}" })
-                }
-                query?.complete?.let { append("complete", it.toString()) }
-                query?.deleted?.let { append("deleted", it.toString()) }
-                pageRequest?.let { appendAll(it.toParams()) }
-            }
-        }.body()
+    ): Page<KomgaSeries>
 
-    }
-
-    suspend fun getCollectionThumbnails(collectionId: KomgaCollectionId): List<KomgaCollectionThumbnail> {
-        return ktor.get("api/v1/collections/$collectionId/thumbnails").body()
-    }
+    suspend fun getCollectionThumbnails(collectionId: KomgaCollectionId): List<KomgaCollectionThumbnail>
 
     suspend fun uploadCollectionThumbnail(
         collectionId: KomgaCollectionId,
         file: ByteArray,
         filename: String = "",
         selected: Boolean = true
-    ): KomgaCollectionThumbnail {
-        return ktor.post("api/v1/collections/$collectionId/thumbnails") {
-            contentType(ContentType.MultiPart.FormData)
-            setBody(
-                MultiPartFormDataContent(formData {
-                    append("file", file, Headers.build {
-                        append(HttpHeaders.ContentDisposition, "filename=\"$filename\"")
-                    })
-                    append("selected", selected)
-                })
-            )
-        }.body()
-    }
+    ): KomgaCollectionThumbnail
 
-    suspend fun selectCollectionThumbnail(collectionId: KomgaCollectionId, thumbnailId: KomgaThumbnailId) {
-        ktor.put("api/v1/collections/$collectionId/thumbnails/$thumbnailId/selected")
-    }
+    suspend fun selectCollectionThumbnail(collectionId: KomgaCollectionId, thumbnailId: KomgaThumbnailId)
 
-    suspend fun deleteCollectionThumbnail(collectionId: KomgaCollectionId, thumbnailId: KomgaThumbnailId) {
-        ktor.delete("api/v1/collections/$collectionId/thumbnails/$thumbnailId")
-    }
-
+    suspend fun deleteCollectionThumbnail(collectionId: KomgaCollectionId, thumbnailId: KomgaThumbnailId)
 }
