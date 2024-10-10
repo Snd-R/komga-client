@@ -2,7 +2,14 @@ package snd.komga.client.book
 
 import kotlinx.datetime.Instant
 import kotlinx.datetime.LocalDate
+import kotlinx.serialization.ExperimentalSerializationApi
+import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.descriptors.PrimitiveKind
+import kotlinx.serialization.descriptors.PrimitiveSerialDescriptor
+import kotlinx.serialization.descriptors.SerialDescriptor
+import kotlinx.serialization.encoding.Decoder
+import kotlinx.serialization.encoding.Encoder
 import snd.komga.client.common.KomgaAuthor
 import snd.komga.client.common.KomgaThumbnailId
 import snd.komga.client.common.KomgaWebLink
@@ -81,10 +88,11 @@ data class KomgaBookThumbnail(
 @Serializable
 data class Media(
     val status: KomgaMediaStatus,
-    val mediaType: String,
+    val mediaType: String?,
     val pagesCount: Int,
     val comment: String,
-    val mediaProfile: MediaProfile,
+    @Serializable(with = MediaProfileSerializer::class)
+    val mediaProfile: MediaProfile?,
     val epubDivinaCompatible: Boolean
 )
 
@@ -92,6 +100,17 @@ enum class MediaProfile {
     DIVINA,
     PDF,
     EPUB,
+}
+
+object MediaProfileSerializer : KSerializer<MediaProfile?> {
+    override val descriptor: SerialDescriptor = PrimitiveSerialDescriptor("MediaProfile", PrimitiveKind.STRING)
+
+    override fun deserialize(decoder: Decoder): MediaProfile? =
+        runCatching { MediaProfile.valueOf(decoder.decodeString()) }.getOrNull()
+
+    @OptIn(ExperimentalSerializationApi::class)
+    override fun serialize(encoder: Encoder, value: MediaProfile?) =
+        value?.let { encoder.encodeString(it.name) } ?: encoder.encodeNull()
 }
 
 @Serializable
