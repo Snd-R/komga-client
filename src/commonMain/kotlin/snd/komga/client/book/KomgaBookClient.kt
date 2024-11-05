@@ -1,13 +1,6 @@
 package snd.komga.client.book
 
 import io.ktor.client.statement.*
-import snd.komga.client.book.KomgaBook
-import snd.komga.client.book.KomgaBookId
-import snd.komga.client.book.KomgaBookMetadataUpdateRequest
-import snd.komga.client.book.KomgaBookPage
-import snd.komga.client.book.KomgaBookQuery
-import snd.komga.client.book.KomgaBookReadProgressUpdateRequest
-import snd.komga.client.book.KomgaBookThumbnail
 import snd.komga.client.common.KomgaPageRequest
 import snd.komga.client.common.KomgaThumbnailId
 import snd.komga.client.common.Page
@@ -48,4 +41,9 @@ interface KomgaBookClient {
     suspend fun getAllReadListsByBook(bookId: KomgaBookId): List<KomgaReadList>
     suspend fun getBookPage(bookId: KomgaBookId, page: Int): ByteArray
     suspend fun <T> streamBookPage(bookId: KomgaBookId, page: Int, block: suspend (response: HttpResponse) -> T): T
+
+    suspend fun getReadiumProgression(bookId: KomgaBookId): R2Progression?
+    suspend fun updateReadiumProgression(bookId: KomgaBookId, progression: R2Progression)
+
+    suspend fun getWebPubManifest(bookId: KomgaBookId): WPPublication
 }

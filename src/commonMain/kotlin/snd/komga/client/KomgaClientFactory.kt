@@ -43,7 +43,12 @@ class KomgaClientFactory private constructor(
             }
 
             install(ContentNegotiation) { json(json) }
-            defaultRequest { url { this.takeFrom(baseUrl()) } }
+            defaultRequest {
+                url {
+                    this.takeFrom(baseUrl())
+                    this.pathSegments = this.pathSegments.filter { it.isNotBlank() } + "" // always add trailing slash
+                }
+            }
 
             val username = builder.username
             val password = builder.password
@@ -77,6 +82,7 @@ class KomgaClientFactory private constructor(
     fun collectionClient() = HttpCollectionClient(ktor)
     fun readListClient() = HttpReadListClient(ktor)
     fun referentialClient() = HttpReferentialClient(ktor)
+    fun ktor() = ktor
 
     //FIXME ktor sse session implementation does NOT terminate sse connection on session context cancellation
     // using custom implementation as a workaround

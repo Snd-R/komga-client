@@ -173,4 +173,25 @@ class HttpBookClient(private val ktor: HttpClient) : KomgaBookClient {
     ): T {
         return ktor.prepareGet("api/v1/books/${bookId}/pages/$page").execute { block(it) }
     }
+
+    override suspend fun getReadiumProgression(bookId: KomgaBookId): R2Progression? {
+        val response: HttpResponse = ktor.get("api/v1/books/${bookId}/progression") {
+            accept(ContentType.Any)
+        }
+        return if (response.status == HttpStatusCode.NoContent) null
+        else response.body()
+    }
+
+    override suspend fun updateReadiumProgression(bookId: KomgaBookId, progression: R2Progression) {
+        ktor.put("api/v1/books/${bookId}/progression") {
+            contentType(ContentType.Application.Json)
+            setBody(progression)
+        }
+    }
+
+    override suspend fun getWebPubManifest(bookId: KomgaBookId): WPPublication {
+        return ktor.get("api/v1/books/${bookId}/manifest") {
+            accept(ContentType.Any)
+        }.body()
+    }
 }
