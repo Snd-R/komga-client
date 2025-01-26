@@ -189,6 +189,12 @@ class HttpBookClient(private val ktor: HttpClient) : KomgaBookClient {
         }
     }
 
+    override suspend fun getReadiumPositions(bookId: KomgaBookId): R2Positions {
+        return  ktor.get("api/v1/books/${bookId}/positions") {
+            accept(ContentType.Any)
+        }.body()
+    }
+
     override suspend fun getWebPubManifest(bookId: KomgaBookId): WPPublication {
         return ktor.get("api/v1/books/${bookId}/manifest") {
             accept(ContentType.Any)

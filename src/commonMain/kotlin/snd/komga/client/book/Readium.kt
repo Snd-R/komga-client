@@ -39,3 +39,9 @@ data class R2Progression(
     val device: R2Device,
     val locator: R2Locator
 )
+
+@Serializable
+data class R2Positions(
+    val total: Int,
+    val positions: List<R2Locator>
+)

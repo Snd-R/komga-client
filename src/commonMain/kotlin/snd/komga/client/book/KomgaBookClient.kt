@@ -44,6 +44,7 @@ interface KomgaBookClient {
 
     suspend fun getReadiumProgression(bookId: KomgaBookId): R2Progression?
     suspend fun updateReadiumProgression(bookId: KomgaBookId, progression: R2Progression)
+    suspend fun getReadiumPositions(bookId: KomgaBookId):R2Positions
 
     suspend fun getWebPubManifest(bookId: KomgaBookId): WPPublication
 }
