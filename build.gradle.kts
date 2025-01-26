@@ -1,6 +1,3 @@
-@file:OptIn(ExperimentalKotlinGradlePluginApi::class)
-
-import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
@@ -12,7 +9,7 @@ plugins {
 }
 
 group = "io.github.snd-r"
-version = "0.6.0"
+version = "0.7.0"
 
 kotlin {
     jvmToolchain(17)
@@ -42,7 +39,6 @@ kotlin {
             implementation(libs.ktor.sse)
         }
 
-        val jvmMain by getting
         jvmMain.dependencies {
             implementation(libs.okhttp)
             implementation(libs.okhttp.sse)
@@ -52,12 +48,15 @@ kotlin {
             implementation(libs.okhttp)
             implementation(libs.okhttp.sse)
         }
+        wasmJsMain.dependencies {
+            implementation(libs.kotlinx.browser)
+        }
     }
 
 }
 android {
     namespace = "snd.komga.client"
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
         minSdk = 26
