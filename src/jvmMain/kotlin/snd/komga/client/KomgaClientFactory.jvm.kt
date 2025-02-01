@@ -9,7 +9,6 @@ import snd.komga.client.sse.KomgaSSESession
 import snd.komga.client.sse.OkHttpKomgaSseSession
 import java.util.concurrent.TimeUnit
 
-
 internal actual suspend fun getSseSession(
     json: Json,
     baseUrl: String,
@@ -36,4 +35,3 @@ internal actual suspend fun getSseSession(
         session
     }
 }
-

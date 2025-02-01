@@ -7,6 +7,7 @@ import okhttp3.HttpUrl.Companion.toHttpUrl
 import okhttp3.OkHttpClient
 import snd.komga.client.sse.KomgaSSESession
 import snd.komga.client.sse.OkHttpKomgaSseSession
+import java.util.concurrent.TimeUnit
 
 internal actual suspend fun getSseSession(
     json: Json,
@@ -17,7 +18,9 @@ internal actual suspend fun getSseSession(
     authCookie: String?
 ): KomgaSSESession {
     return withContext(Dispatchers.IO) {
-        val client = OkHttpClient.Builder().build()
+        val client = OkHttpClient.Builder()
+            .readTimeout(0, TimeUnit.SECONDS)
+            .build()
         val session = OkHttpKomgaSseSession(
             client = client,
             json = json,
@@ -28,7 +31,7 @@ internal actual suspend fun getSseSession(
             authCookie = authCookie
         )
         session.connect()
+
         session
     }
 }
-
