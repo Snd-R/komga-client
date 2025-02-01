@@ -102,10 +102,10 @@ class HttpReadListClient internal constructor(private val ktor: HttpClient) : Ko
     }
 
     override suspend fun getBookSiblingNext(readListId: KomgaReadListId, bookId: KomgaBookId): KomgaBook {
-        return ktor.put("api/v1/readlists/$readListId/books/$bookId/next").body()
+        return ktor.get("api/v1/readlists/$readListId/books/$bookId/next").body()
     }
 
     override suspend fun getBookSiblingPrevious(readListId: KomgaReadListId, bookId: KomgaBookId): KomgaBook {
-        return ktor.put("api/v1/readlists/$readListId/books/$bookId/previous").body()
+        return ktor.get("api/v1/readlists/$readListId/books/$bookId/previous").body()
     }
 }
