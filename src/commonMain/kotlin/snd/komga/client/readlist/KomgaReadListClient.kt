@@ -1,6 +1,7 @@
 package snd.komga.client.readlist
 
 import snd.komga.client.book.KomgaBook
+import snd.komga.client.book.KomgaBookId
 import snd.komga.client.common.KomgaPageRequest
 import snd.komga.client.common.KomgaThumbnailId
 import snd.komga.client.common.Page
@@ -34,4 +35,7 @@ interface KomgaReadListClient {
 
     suspend fun selectReadListThumbnail(readListId: KomgaReadListId, thumbnailId: KomgaThumbnailId)
     suspend fun deleteReadListThumbnail(readListId: KomgaReadListId, thumbnailId: KomgaThumbnailId)
+
+    suspend fun getBookSiblingNext(readListId: KomgaReadListId, bookId: KomgaBookId): KomgaBook
+    suspend fun getBookSiblingPrevious(readListId: KomgaReadListId, bookId: KomgaBookId): KomgaBook
 }

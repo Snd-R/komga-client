@@ -6,6 +6,7 @@ import io.ktor.client.request.*
 import io.ktor.client.request.forms.*
 import io.ktor.http.*
 import snd.komga.client.book.KomgaBook
+import snd.komga.client.book.KomgaBookId
 import snd.komga.client.common.KomgaPageRequest
 import snd.komga.client.common.KomgaThumbnailId
 import snd.komga.client.common.Page
@@ -98,5 +99,13 @@ class HttpReadListClient internal constructor(private val ktor: HttpClient) : Ko
 
     override suspend fun deleteReadListThumbnail(readListId: KomgaReadListId, thumbnailId: KomgaThumbnailId) {
         ktor.delete("api/v1/readlists/$readListId/thumbnails/$thumbnailId")
+    }
+
+    override suspend fun getBookSiblingNext(readListId: KomgaReadListId, bookId: KomgaBookId): KomgaBook {
+        return ktor.put("api/v1/readlists/$readListId/books/$bookId/next").body()
+    }
+
+    override suspend fun getBookSiblingPrevious(readListId: KomgaReadListId, bookId: KomgaBookId): KomgaBook {
+        return ktor.put("api/v1/readlists/$readListId/books/$bookId/previous").body()
     }
 }
