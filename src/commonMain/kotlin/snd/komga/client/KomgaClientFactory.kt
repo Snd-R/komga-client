@@ -88,7 +88,7 @@ class KomgaClientFactory private constructor(
     // using custom implementation as a workaround
     suspend fun sseSession(): KomgaSSESession {
         val authCookie = ktor.cookies(Url(baseUrl()))
-            .find { it.name == "SESSION" }
+            .find { it.name == "SESSION" || it.name == "KOMGA-SESSION" }
             ?.let { renderCookieHeader(it) }
 
         return getSseSession(
