@@ -1,17 +1,33 @@
 package snd.komga.client.book
 
-import io.ktor.client.*
-import io.ktor.client.call.*
-import io.ktor.client.request.*
-import io.ktor.client.request.forms.*
-import io.ktor.client.statement.*
-import io.ktor.http.*
+import io.ktor.client.HttpClient
+import io.ktor.client.call.body
+import io.ktor.client.request.accept
+import io.ktor.client.request.delete
+import io.ktor.client.request.forms.MultiPartFormDataContent
+import io.ktor.client.request.forms.formData
+import io.ktor.client.request.get
+import io.ktor.client.request.parameter
+import io.ktor.client.request.patch
+import io.ktor.client.request.post
+import io.ktor.client.request.prepareGet
+import io.ktor.client.request.put
+import io.ktor.client.request.setBody
+import io.ktor.client.statement.HttpResponse
+import io.ktor.http.ContentType
+import io.ktor.http.Headers
+import io.ktor.http.HttpHeaders
+import io.ktor.http.HttpStatusCode
+import io.ktor.http.ParametersBuilder
+import io.ktor.http.contentType
+import io.ktor.http.path
 import snd.komga.client.common.KomgaPageRequest
 import snd.komga.client.common.KomgaThumbnailId
 import snd.komga.client.common.Page
 import snd.komga.client.common.toParams
 import snd.komga.client.library.KomgaLibraryId
 import snd.komga.client.readlist.KomgaReadList
+import snd.komga.client.search.BookConditionBuilder
 
 
 class HttpBookClient(private val ktor: HttpClient) : KomgaBookClient {
@@ -20,6 +36,7 @@ class HttpBookClient(private val ktor: HttpClient) : KomgaBookClient {
         return ktor.get("api/v1/books/$bookId").body()
     }
 
+    @Deprecated("use getBookList()")
     override suspend fun getAllBooks(
         query: KomgaBookQuery?,
         pageRequest: KomgaPageRequest?,
@@ -39,6 +56,31 @@ class HttpBookClient(private val ktor: HttpClient) : KomgaBookClient {
                 path("api/v1/books")
                 parameters.appendAll(params)
             }
+        }.body()
+    }
+
+    override suspend fun getBookList(
+        conditionBuilder: BookConditionBuilder,
+        fullTextSearch: String?,
+        pageRequest: KomgaPageRequest?
+    ): Page<KomgaBook> {
+        return getBookList(
+            search = KomgaBookSearch(
+                condition = conditionBuilder.toBookCondition(),
+                fullTextSearch = fullTextSearch
+            ),
+            pageRequest = pageRequest
+        )
+    }
+
+    override suspend fun getBookList(
+        search: KomgaBookSearch,
+        pageRequest: KomgaPageRequest?
+    ): Page<KomgaBook> {
+        return ktor.post("api/v1/books/list") {
+            pageRequest?.let { url.parameters.appendAll(it.toParams()) }
+            contentType(ContentType.Application.Json)
+            setBody(search)
         }.body()
     }
 
@@ -190,7 +232,7 @@ class HttpBookClient(private val ktor: HttpClient) : KomgaBookClient {
     }
 
     override suspend fun getReadiumPositions(bookId: KomgaBookId): R2Positions {
-        return  ktor.get("api/v1/books/${bookId}/positions") {
+        return ktor.get("api/v1/books/${bookId}/positions") {
             accept(ContentType.Any)
         }.body()
     }

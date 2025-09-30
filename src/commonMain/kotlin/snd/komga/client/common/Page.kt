@@ -35,10 +35,11 @@ data class Sort(
     val empty: Boolean
 )
 
+@Serializable
 data class KomgaPageRequest(
     val pageIndex: Int? = null,
     val size: Int? = null,
-    val sort: KomgaSort = KomgaSort.UNSORTED,
+    val sort: KomgaSort = KomgaSort.Unsorted,
     val unpaged: Boolean? = false,
 )
 
@@ -49,7 +50,7 @@ fun KomgaPageRequest.toParams(): Parameters {
     unpaged?.let { builder.append("unpaged", it.toString()) }
 
     val sort = buildString {
-        for (order in sort) {
+        for (order in sort.orders) {
             append(order.property)
             append(",")
             append(order.direction.name.lowercase())
@@ -69,7 +70,7 @@ fun KomgaPageRequest.toMap(): Map<String, String> {
     pageIndex?.let { map["page"] = it.toString() }
     unpaged?.let { map["unpaged"] = it.toString() }
     val sort = buildString {
-        for (order in sort) {
+        for (order in sort.orders) {
             append(order.property)
             append(",")
             append(order.direction.name.lowercase())

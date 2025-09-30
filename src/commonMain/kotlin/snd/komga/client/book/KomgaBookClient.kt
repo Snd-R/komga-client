@@ -1,15 +1,30 @@
 package snd.komga.client.book
 
-import io.ktor.client.statement.*
+import io.ktor.client.statement.HttpResponse
 import snd.komga.client.common.KomgaPageRequest
 import snd.komga.client.common.KomgaThumbnailId
 import snd.komga.client.common.Page
 import snd.komga.client.library.KomgaLibraryId
 import snd.komga.client.readlist.KomgaReadList
+import snd.komga.client.search.BookConditionBuilder
 
 interface KomgaBookClient {
     suspend fun getBook(bookId: KomgaBookId): KomgaBook
+
+    @Deprecated("use getBookList()")
     suspend fun getAllBooks(query: KomgaBookQuery? = null, pageRequest: KomgaPageRequest? = null): Page<KomgaBook>
+
+    suspend fun getBookList(
+        conditionBuilder: BookConditionBuilder,
+        fullTextSearch: String? = null,
+        pageRequest: KomgaPageRequest? = null,
+    ): Page<KomgaBook>
+
+    suspend fun getBookList(
+        search: KomgaBookSearch,
+        pageRequest: KomgaPageRequest? = null,
+    ): Page<KomgaBook>
+
     suspend fun getLatestBooks(pageRequest: KomgaPageRequest? = null): Page<KomgaBook>
     suspend fun getBooksOnDeck(
         libraryIds: List<KomgaLibraryId>? = null,
@@ -44,7 +59,7 @@ interface KomgaBookClient {
 
     suspend fun getReadiumProgression(bookId: KomgaBookId): R2Progression?
     suspend fun updateReadiumProgression(bookId: KomgaBookId, progression: R2Progression)
-    suspend fun getReadiumPositions(bookId: KomgaBookId):R2Positions
+    suspend fun getReadiumPositions(bookId: KomgaBookId): R2Positions
 
     suspend fun getWebPubManifest(bookId: KomgaBookId): WPPublication
 }

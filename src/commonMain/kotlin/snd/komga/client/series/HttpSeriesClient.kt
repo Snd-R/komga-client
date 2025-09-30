@@ -1,16 +1,31 @@
 package snd.komga.client.series
 
-import io.ktor.client.*
-import io.ktor.client.call.*
-import io.ktor.client.request.*
-import io.ktor.client.request.forms.*
-import io.ktor.http.*
+import io.ktor.client.HttpClient
+import io.ktor.client.call.body
+import io.ktor.client.request.accept
+import io.ktor.client.request.delete
+import io.ktor.client.request.forms.MultiPartFormDataContent
+import io.ktor.client.request.forms.formData
+import io.ktor.client.request.get
+import io.ktor.client.request.patch
+import io.ktor.client.request.post
+import io.ktor.client.request.put
+import io.ktor.client.request.setBody
+import io.ktor.http.ContentType
+import io.ktor.http.Headers
+import io.ktor.http.HttpHeaders
+import io.ktor.http.contentType
 import snd.komga.client.book.KomgaBook
 import snd.komga.client.book.KomgaMediaStatus
 import snd.komga.client.book.KomgaReadStatus
 import snd.komga.client.collection.KomgaCollection
-import snd.komga.client.common.*
+import snd.komga.client.common.KomgaAuthor
+import snd.komga.client.common.KomgaPageRequest
+import snd.komga.client.common.KomgaThumbnailId
+import snd.komga.client.common.Page
+import snd.komga.client.common.toParams
 import snd.komga.client.library.KomgaLibraryId
+import snd.komga.client.search.SeriesConditionBuilder
 
 class HttpSeriesClient(private val ktor: HttpClient) : KomgaSeriesClient {
 
@@ -18,6 +33,7 @@ class HttpSeriesClient(private val ktor: HttpClient) : KomgaSeriesClient {
         return ktor.get("api/v1/series/$seriesId").body()
     }
 
+    @Deprecated("use getSeriesList()")
     override suspend fun getAllSeries(
         query: KomgaSeriesQuery?,
         pageRequest: KomgaPageRequest?,
@@ -68,6 +84,31 @@ class HttpSeriesClient(private val ktor: HttpClient) : KomgaSeriesClient {
                 query?.oneshot?.let { append("oneshot", it.toString()) }
                 pageRequest?.let { appendAll(it.toParams()) }
             }
+        }.body()
+    }
+
+    override suspend fun getSeriesList(
+        conditionBuilder: SeriesConditionBuilder,
+        fulltextSearch: String?,
+        pageRequest: KomgaPageRequest?
+    ): Page<KomgaSeries> {
+        return getSeriesList(
+            search = KomgaSeriesSearch(
+                condition = conditionBuilder.toSeriesCondition(),
+                fulltextSearch = fulltextSearch
+            ),
+            pageRequest = pageRequest
+        )
+    }
+
+    override suspend fun getSeriesList(
+        search: KomgaSeriesSearch,
+        pageRequest: KomgaPageRequest?
+    ): Page<KomgaSeries> {
+        return ktor.post("api/v1/series/list") {
+            pageRequest?.let { url.parameters.appendAll(it.toParams()) }
+            contentType(ContentType.Application.Json)
+            setBody(search)
         }.body()
     }
 

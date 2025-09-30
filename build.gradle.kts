@@ -9,7 +9,7 @@ plugins {
 }
 
 group = "io.github.snd-r"
-version = "0.8.0"
+version = "0.9.0-SNAPSHOT"
 
 kotlin {
     jvmToolchain(17)
@@ -22,11 +22,14 @@ kotlin {
     }
     @OptIn(org.jetbrains.kotlin.gradle.ExperimentalWasmDsl::class)
     wasmJs {
-        moduleName = "komga-client"
+        outputModuleName = "komga-client"
         browser()
     }
 
     sourceSets {
+        all {
+            languageSettings.optIn("kotlin.time.ExperimentalTime")
+        }
         commonMain.dependencies {
             implementation(libs.kotlin.logging)
             implementation(libs.kotlinx.datetime)
@@ -56,7 +59,7 @@ kotlin {
 }
 android {
     namespace = "snd.komga.client"
-    compileSdk = 35
+    compileSdk = 36
 
     defaultConfig {
         minSdk = 26

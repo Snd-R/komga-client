@@ -9,15 +9,29 @@ import snd.komga.client.common.KomgaPageRequest
 import snd.komga.client.common.KomgaThumbnailId
 import snd.komga.client.common.Page
 import snd.komga.client.library.KomgaLibraryId
+import snd.komga.client.search.SeriesConditionBuilder
 
 interface KomgaSeriesClient {
     suspend fun getOneSeries(seriesId: KomgaSeriesId): KomgaSeries
 
+    @Deprecated("use getSeriesList()")
     suspend fun getAllSeries(
         query: KomgaSeriesQuery? = null,
         pageRequest: KomgaPageRequest? = null,
     ): Page<KomgaSeries>
 
+    suspend fun getSeriesList(
+        conditionBuilder: SeriesConditionBuilder,
+        fulltextSearch: String?,
+        pageRequest: KomgaPageRequest? = null,
+    ): Page<KomgaSeries>
+
+    suspend fun getSeriesList(
+        search: KomgaSeriesSearch,
+        pageRequest: KomgaPageRequest? = null,
+    ): Page<KomgaSeries>
+
+    @Deprecated("use getBookist() from book client")
     suspend fun getAllBooksBySeries(
         seriesId: KomgaSeriesId,
         mediaStatus: List<KomgaMediaStatus>? = null,
