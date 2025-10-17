@@ -10,13 +10,6 @@ import snd.komga.client.search.KomgaSearchCondition.AuthorMatch
 import snd.komga.client.search.KomgaSearchCondition.SeriesCondition
 import snd.komga.client.series.KomgaSeriesId
 import snd.komga.client.series.KomgaSeriesStatus
-import snd.komga.client.series.search.BooleanOpBuilder
-import snd.komga.client.series.search.DateOpBuilder
-import snd.komga.client.series.search.EqualityBuilder
-import snd.komga.client.series.search.EqualityNullableBuilder
-import snd.komga.client.series.search.NumericNullableOpBuilder
-import snd.komga.client.series.search.NumericOpBuilder
-import snd.komga.client.series.search.StringOpBuilder
 
 @DslMarker
 annotation class ConditionDsl

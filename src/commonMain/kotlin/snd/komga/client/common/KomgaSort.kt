@@ -12,12 +12,15 @@ private const val seriesFolderName = "name"
 private const val seriesBooksCount = "booksCount"
 
 private const val bookCreated = "createdDate"
+private const val bookSeriesTitle = "series"
 private const val bookFilename = "name"
 private const val bookFileSize = "fileSize"
 private const val bookLastModified = "lastModified"
 private const val bookNumber = "metadata.numberSort"
 private const val bookReadDate = "readProgress.readDate"
+private const val bookTitle = "metadata.title"
 private const val bookReleaseDate = "metadata.releaseDate"
+private const val bookPageCount = "metadata.pagesCount"
 
 private const val userDateTime = "dateTime"
 
@@ -57,56 +60,30 @@ sealed interface KomgaSort {
         }
 
         companion object {
-            fun byTitleAsc(): KomgaSeriesSort {
-                return KomgaSeriesSort(listOf(Order(seriesTitleSort, ASC)))
-            }
+            fun byTitle(direction: Direction) = KomgaSeriesSort(listOf(Order(seriesTitleSort, direction)))
+            fun byTitleAsc() = KomgaSeriesSort(listOf(Order(seriesTitleSort, ASC)))
+            fun byTitleDesc() = KomgaSeriesSort(listOf(Order(seriesTitleSort, DESC)))
 
-            fun byTitleDesc(): KomgaSeriesSort {
-                return KomgaSeriesSort(listOf(Order(seriesTitleSort, DESC)))
-            }
+            fun byCreatedDate(direction: Direction) = KomgaSeriesSort(listOf(Order(seriesCreated, direction)))
+            fun byCreatedDateAsc() = KomgaSeriesSort(listOf(Order(seriesCreated, ASC)))
+            fun byCreatedDateDesc() = KomgaSeriesSort(listOf(Order(seriesCreated, DESC)))
 
-            fun byCreatedDateAsc(): KomgaSeriesSort {
-                return KomgaSeriesSort(listOf(Order(seriesCreated, ASC)))
-            }
+            fun byReleaseDate(direction: Direction) = KomgaSeriesSort(listOf(Order(seriesReleaseDate, direction)))
+            fun byReleaseDateAsc() = KomgaSeriesSort(listOf(Order(seriesReleaseDate, ASC)))
+            fun byReleaseDateDesc() = KomgaSeriesSort(listOf(Order(seriesReleaseDate, DESC)))
 
-            fun byCreatedDateDesc(): KomgaSeriesSort {
-                return KomgaSeriesSort(listOf(Order(seriesCreated, DESC)))
-            }
+            fun byFolderName(direction: Direction) = KomgaSeriesSort(listOf(Order(seriesFolderName, direction)))
+            fun byFolderNameAsc() = KomgaSeriesSort(listOf(Order(seriesFolderName, ASC)))
+            fun byFolderNameDesc() = KomgaSeriesSort(listOf(Order(seriesFolderName, DESC)))
 
-            fun byReleaseDateAsc(): KomgaSeriesSort {
-                return KomgaSeriesSort(listOf(Order(seriesReleaseDate, ASC)))
-            }
+            fun byBooksCount(direction: Direction) = KomgaSeriesSort(listOf(Order(seriesBooksCount, direction)))
+            fun byBooksCountAsc() = KomgaSeriesSort(listOf(Order(seriesBooksCount, ASC)))
+            fun byBooksCountDesc() = KomgaSeriesSort(listOf(Order(seriesBooksCount, DESC)))
 
-            fun byReleaseDateDesc(): KomgaSeriesSort {
-                return KomgaSeriesSort(listOf(Order(seriesReleaseDate, DESC)))
-            }
-
-            fun byFolderNameAsc(): KomgaSeriesSort {
-                return KomgaSeriesSort(listOf(Order(seriesFolderName, ASC)))
-            }
-
-            fun byFolderNameDesc(): KomgaSeriesSort {
-                return KomgaSeriesSort(listOf(Order(seriesFolderName, DESC)))
-            }
-
-            fun byBooksCountAsc(): KomgaSeriesSort {
-                return KomgaSeriesSort(listOf(Order(seriesBooksCount, ASC)))
-            }
-
-            fun byBooksCountDesc(): KomgaSeriesSort {
-                return KomgaSeriesSort(listOf(Order(seriesBooksCount, DESC)))
-            }
-
-            fun byLastModifiedDateAsc(): KomgaSeriesSort {
-                return KomgaSeriesSort(listOf(Order(seriesLastModified, ASC)))
-            }
-
-            fun byLastModifiedDateDesc(): KomgaSeriesSort {
-                return KomgaSeriesSort(listOf(Order(seriesLastModified, DESC)))
-            }
+            fun byLastModifiedDate(direction: Direction) = KomgaSeriesSort(listOf(Order(seriesLastModified, direction)))
+            fun byLastModifiedDateAsc() = KomgaSeriesSort(listOf(Order(seriesLastModified, ASC)))
+            fun byLastModifiedDateDesc() = KomgaSeriesSort(listOf(Order(seriesLastModified, DESC)))
         }
-
-
     }
 
     @Serializable
@@ -125,45 +102,41 @@ sealed interface KomgaSort {
 
         companion object {
 
-            fun byCreatedDateAsc(): KomgaBooksSort {
-                return KomgaBooksSort(listOf(Order(bookCreated, ASC)))
-            }
+            fun byCreatedDate(direction: Direction) = KomgaBooksSort(listOf(Order(bookCreated, direction)))
+            fun byCreatedDateAsc() = KomgaBooksSort(listOf(Order(bookCreated, ASC)))
+            fun byCreatedDateDesc() = KomgaBooksSort(listOf(Order(bookCreated, DESC)))
 
-            fun byCreatedDateDesc(): KomgaBooksSort {
-                return KomgaBooksSort(listOf(Order(bookCreated, DESC)))
-            }
+            fun byFileName(direction: Direction) = KomgaBooksSort(listOf(Order(bookFilename, direction)))
+            fun byFileNameAsc() = KomgaBooksSort(listOf(Order(bookFilename, ASC)))
+            fun byFileNameDesc() = KomgaBooksSort(listOf(Order(bookFilename, DESC)))
 
-            fun byFileNameAsc(): KomgaBooksSort {
-                return KomgaBooksSort(listOf(Order(bookFilename, ASC)))
-            }
+            fun byLastModifiedDate(direction: Direction) = KomgaBooksSort(listOf(Order(bookLastModified, direction)))
+            fun byLastModifiedDateAsc() = KomgaBooksSort(listOf(Order(bookLastModified, ASC)))
+            fun byLastModifiedDateDesc() = KomgaBooksSort(listOf(Order(bookLastModified, DESC)))
 
-            fun byFileNameDesc(): KomgaBooksSort {
-                return KomgaBooksSort(listOf(Order(bookFilename, DESC)))
-            }
+            fun byNumber(direction: Direction) = KomgaBooksSort(listOf(Order(bookNumber, direction)))
+            fun byNumberAsc() = KomgaBooksSort(listOf(Order(bookNumber, ASC)))
+            fun byNumberDesc() = KomgaBooksSort(listOf(Order(bookNumber, DESC)))
 
-            fun byLastModifiedDateDesc(): KomgaBooksSort {
-                return KomgaBooksSort(listOf(Order(bookLastModified, DESC)))
-            }
+            fun byReadDate(direction: Direction) = KomgaBooksSort(listOf(Order(bookReadDate, direction)))
+            fun byReadDateAsc() = KomgaBooksSort(listOf(Order(bookReadDate, ASC)))
+            fun byReadDateDesc() = KomgaBooksSort(listOf(Order(bookReadDate, DESC)))
 
-            fun byNumberAsc(): KomgaBooksSort {
-                return KomgaBooksSort(listOf(Order(bookNumber, ASC)))
-            }
+            fun byReleaseDate(direction: Direction) = KomgaBooksSort(listOf(Order(bookReleaseDate, direction)))
+            fun byReleaseDateAsc() = KomgaBooksSort(listOf(Order(bookReleaseDate, ASC)))
+            fun byReleaseDateDesc() = KomgaBooksSort(listOf(Order(bookReleaseDate, DESC)))
 
-            fun byNumberDesc(): KomgaBooksSort {
-                return KomgaBooksSort(listOf(Order(bookNumber, DESC)))
-            }
+            fun bySeriesTitle(direction: Direction) = KomgaBooksSort(listOf(Order(bookSeriesTitle, direction)))
+            fun bySeriesTitleAsc() = KomgaBooksSort(listOf(Order(bookSeriesTitle, ASC)))
+            fun bySeriesTitleDesc() = KomgaBooksSort(listOf(Order(bookSeriesTitle, DESC)))
 
-            fun byReadDateDesc(): KomgaBooksSort {
-                return KomgaBooksSort(listOf(Order(bookReadDate, DESC)))
-            }
+            fun byTitle(direction: Direction) = KomgaBooksSort(listOf(Order(bookTitle, direction)))
+            fun byTitleAsc() = KomgaBooksSort(listOf(Order(bookTitle, ASC)))
+            fun byTitleDesc() = KomgaBooksSort(listOf(Order(bookTitle, DESC)))
 
-            fun byReleaseDateAsc(): KomgaBooksSort {
-                return KomgaBooksSort(listOf(Order(bookReleaseDate, ASC)))
-            }
-
-            fun byReleaseDateDesc(): KomgaBooksSort {
-                return KomgaBooksSort(listOf(Order(bookReleaseDate, DESC)))
-            }
+            fun byPagesCount(direction: Direction) = KomgaBooksSort(listOf(Order(bookPageCount, direction)))
+            fun byPagesCountAsc() = KomgaBooksSort(listOf(Order(bookPageCount, ASC)))
+            fun byPagesCountDesc() = KomgaBooksSort(listOf(Order(bookPageCount, DESC)))
         }
     }
 

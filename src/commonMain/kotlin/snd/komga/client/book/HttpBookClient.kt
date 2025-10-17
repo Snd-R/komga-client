@@ -101,7 +101,7 @@ class HttpBookClient(private val ktor: HttpClient) : KomgaBookClient {
             url {
                 path("api/v1/books/ondeck")
                 pageRequest?.let { parameters.appendAll(it.toParams()) }
-                libraryIds?.let { parameters.append("library_id", it.joinToString()) }
+                libraryIds?.ifEmpty { null }?.let { parameters.append("library_id", it.joinToString()) }
             }
         }.body()
     }

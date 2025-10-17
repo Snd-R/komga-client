@@ -1,10 +1,10 @@
 package snd.komga.client.book
 
-import kotlinx.datetime.Instant
 import kotlinx.datetime.LocalDate
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonElement
+import kotlin.time.Instant
 
 @Serializable
 data class WPPublication(

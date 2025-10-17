@@ -1,6 +1,5 @@
 package snd.komga.client.book
 
-import kotlinx.datetime.Instant
 import kotlinx.datetime.LocalDate
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.KSerializer
@@ -16,6 +15,7 @@ import snd.komga.client.common.KomgaWebLink
 import snd.komga.client.library.KomgaLibraryId
 import snd.komga.client.series.KomgaSeriesId
 import kotlin.jvm.JvmInline
+import kotlin.time.Instant
 
 
 @Serializable

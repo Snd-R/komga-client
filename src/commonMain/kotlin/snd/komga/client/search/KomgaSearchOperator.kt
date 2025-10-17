@@ -2,11 +2,11 @@
 
 package snd.komga.client.search
 
-import kotlinx.datetime.DateTimePeriod
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonClassDiscriminator
+import kotlin.time.Duration
 import kotlin.time.Instant
 
 class KomgaSearchOperator {
@@ -124,13 +124,13 @@ class KomgaSearchOperator {
     @Serializable
     @SerialName("isInTheLast")
     data class IsInTheLast(
-        val duration: DateTimePeriod,
+        val duration: Duration,
     ) : Date
 
     @Serializable
     @SerialName("isNotInTheLast")
     data class IsNotInTheLast(
-        val duration: DateTimePeriod,
+        val duration: Duration,
     ) : Date
 
     @Serializable
@@ -161,3 +161,4 @@ class KomgaSearchOperator {
         NumericNullable<T>,
         EqualityNullable<T>
 }
+

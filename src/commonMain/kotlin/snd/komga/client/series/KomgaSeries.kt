@@ -6,10 +6,10 @@ import snd.komga.client.common.KomgaThumbnailId
 import snd.komga.client.common.KomgaWebLink
 import snd.komga.client.library.KomgaLibraryId
 import snd.komga.client.serializers.KomgaReadingDirectionSerializer
-import kotlinx.datetime.Instant
 import kotlinx.datetime.LocalDate
 import kotlinx.serialization.Serializable
 import kotlin.jvm.JvmInline
+import kotlin.time.Instant
 
 @Serializable
 @JvmInline

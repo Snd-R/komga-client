@@ -2,9 +2,9 @@ package snd.komga.client.readlist
 
 import snd.komga.client.book.KomgaBookId
 import snd.komga.client.common.KomgaThumbnailId
-import kotlinx.datetime.Instant
 import kotlinx.serialization.Serializable
 import kotlin.jvm.JvmInline
+import kotlin.time.Instant
 
 @Serializable
 @JvmInline

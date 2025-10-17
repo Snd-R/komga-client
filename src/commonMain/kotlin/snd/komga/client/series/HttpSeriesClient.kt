@@ -95,7 +95,7 @@ class HttpSeriesClient(private val ktor: HttpClient) : KomgaSeriesClient {
         return getSeriesList(
             search = KomgaSeriesSearch(
                 condition = conditionBuilder.toSeriesCondition(),
-                fulltextSearch = fulltextSearch
+                fullTextSearch = fulltextSearch
             ),
             pageRequest = pageRequest
         )
@@ -112,6 +112,7 @@ class HttpSeriesClient(private val ktor: HttpClient) : KomgaSeriesClient {
         }.body()
     }
 
+    @Deprecated("use getBookist() from book client")
     override suspend fun getAllBooksBySeries(
         seriesId: KomgaSeriesId,
         mediaStatus: List<KomgaMediaStatus>?,

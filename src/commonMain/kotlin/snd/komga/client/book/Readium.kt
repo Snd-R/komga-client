@@ -1,7 +1,7 @@
 package snd.komga.client.book
 
-import kotlinx.datetime.Instant
 import kotlinx.serialization.Serializable
+import kotlin.time.Instant
 
 @Serializable
 data class R2Device(

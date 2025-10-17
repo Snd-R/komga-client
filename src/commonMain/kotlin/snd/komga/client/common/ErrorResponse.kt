@@ -3,9 +3,9 @@ package snd.komga.client.common
 import io.ktor.client.call.*
 import io.ktor.client.plugins.*
 import io.ktor.serialization.*
-import kotlinx.datetime.Instant
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.SerializationException
+import kotlin.time.Instant
 
 @Serializable
 data class ErrorResponse(

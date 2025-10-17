@@ -6,9 +6,9 @@ kotlinx-browser = "0.5.0"
 kotlinx-coroutines = "1.10.2"
 kotlinx-datetime = "0.7.1"
 kotlinx-serialization = "1.9.0"
-ktor = "3.3.0"
+ktor = "3.3.1"
 mavenPublish = "0.34.0"
-okhttp = "5.1.0"
+okhttp = "5.2.1"
 
 [libraries]
 kotlin-logging = { module = "io.github.oshai:kotlin-logging", version.ref = "kotlin-logging" }

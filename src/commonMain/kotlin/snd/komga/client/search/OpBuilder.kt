@@ -1,8 +1,8 @@
-package snd.komga.client.series.search
+package snd.komga.client.search
 
 import kotlinx.datetime.DateTimePeriod
-import kotlinx.datetime.Instant
-import snd.komga.client.search.KomgaSearchOperator
+import kotlin.time.Duration
+import kotlin.time.Instant
 
 abstract class OpBuilder<T> {
 }
@@ -145,13 +145,13 @@ open class DateOpBuilder internal constructor() : OpBuilder<Instant>() {
         return operator
     }
 
-    fun isInLast(value: DateTimePeriod): KomgaSearchOperator.Date {
+    fun isInLast(value: Duration): KomgaSearchOperator.Date {
         val operator = KomgaSearchOperator.IsInTheLast(value)
         this.operator = operator
         return operator
     }
 
-    fun isNotInLast(value: DateTimePeriod): KomgaSearchOperator.Date {
+    fun isNotInLast(value: Duration): KomgaSearchOperator.Date {
         val operator = KomgaSearchOperator.IsNotInTheLast(value)
         this.operator = operator
         return operator
