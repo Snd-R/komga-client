@@ -91,9 +91,10 @@ data class Media(
     val mediaType: String?,
     val pagesCount: Int,
     val comment: String,
+    val epubDivinaCompatible: Boolean,
+    val epubIsKepub: Boolean,
     @Serializable(with = MediaProfileSerializer::class)
     val mediaProfile: MediaProfile?,
-    val epubDivinaCompatible: Boolean
 )
 
 enum class MediaProfile {
@@ -118,6 +119,8 @@ data class ReadProgress(
     val page: Int,
     val completed: Boolean,
     val readDate: Instant,
+    val deviceId: String,
+    val deviceName: String,
     val created: Instant,
     val lastModified: Instant,
 )

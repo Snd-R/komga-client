@@ -1,26 +1,12 @@
 package snd.komga.client.book
 
-import io.ktor.client.HttpClient
-import io.ktor.client.call.body
-import io.ktor.client.request.accept
-import io.ktor.client.request.delete
-import io.ktor.client.request.forms.MultiPartFormDataContent
-import io.ktor.client.request.forms.formData
-import io.ktor.client.request.get
-import io.ktor.client.request.parameter
-import io.ktor.client.request.patch
-import io.ktor.client.request.post
-import io.ktor.client.request.prepareGet
-import io.ktor.client.request.put
-import io.ktor.client.request.setBody
-import io.ktor.client.statement.HttpResponse
-import io.ktor.http.ContentType
-import io.ktor.http.Headers
-import io.ktor.http.HttpHeaders
-import io.ktor.http.HttpStatusCode
-import io.ktor.http.ParametersBuilder
-import io.ktor.http.contentType
-import io.ktor.http.path
+import io.ktor.client.*
+import io.ktor.client.call.*
+import io.ktor.client.plugins.*
+import io.ktor.client.request.*
+import io.ktor.client.request.forms.*
+import io.ktor.client.statement.*
+import io.ktor.http.*
 import snd.komga.client.common.KomgaPageRequest
 import snd.komga.client.common.KomgaThumbnailId
 import snd.komga.client.common.Page
@@ -32,31 +18,8 @@ import snd.komga.client.search.BookConditionBuilder
 
 class HttpBookClient(private val ktor: HttpClient) : KomgaBookClient {
 
-    override suspend fun getBook(bookId: KomgaBookId): KomgaBook {
+    override suspend fun getOne(bookId: KomgaBookId): KomgaBook {
         return ktor.get("api/v1/books/$bookId").body()
-    }
-
-    @Deprecated("use getBookList()")
-    override suspend fun getAllBooks(
-        query: KomgaBookQuery?,
-        pageRequest: KomgaPageRequest?,
-    ): Page<KomgaBook> {
-        val params = ParametersBuilder().apply {
-            query?.searchTerm?.let { append("search", it) }
-            query?.libraryIds?.let { if (it.isNotEmpty()) append("library_id", it.joinToString(",")) }
-            query?.mediaStatus?.let { append("media_status", it.joinToString(",")) }
-            query?.readStatus?.let { append("read_status", it.joinToString(",")) }
-            query?.releasedAfter?.let { append("released_after", it.toString()) }
-            query?.tags?.let { append("tag", it.joinToString(",")) }
-            pageRequest?.let { appendAll(it.toParams()) }
-        }.build()
-
-        return ktor.get {
-            url {
-                path("api/v1/books")
-                parameters.appendAll(params)
-            }
-        }.body()
     }
 
     override suspend fun getBookList(
@@ -115,12 +78,22 @@ class HttpBookClient(private val ktor: HttpClient) : KomgaBookClient {
         }.body()
     }
 
-    override suspend fun getBookSiblingPrevious(bookId: KomgaBookId): KomgaBook {
-        return ktor.get("api/v1/books/$bookId/previous").body()
+    override suspend fun getBookSiblingPrevious(bookId: KomgaBookId): KomgaBook? {
+        return try {
+            ktor.get("api/v1/books/$bookId/previous").body()
+        } catch (e: ClientRequestException) {
+            if (e.response.status == HttpStatusCode.NotFound) null
+            else throw e
+        }
     }
 
-    override suspend fun getBookSiblingNext(bookId: KomgaBookId): KomgaBook {
-        return ktor.get("api/v1/books/$bookId/next").body()
+    override suspend fun getBookSiblingNext(bookId: KomgaBookId): KomgaBook? {
+        return try {
+            ktor.get("api/v1/books/$bookId/next").body()
+        } catch (e: ClientRequestException) {
+            if (e.response.status == HttpStatusCode.NotFound) null
+            else throw e
+        }
     }
 
     override suspend fun updateMetadata(bookId: KomgaBookId, request: KomgaBookMetadataUpdateRequest) {
@@ -163,17 +136,31 @@ class HttpBookClient(private val ktor: HttpClient) : KomgaBookClient {
         }
     }
 
-    override suspend fun getBookThumbnail(bookId: KomgaBookId): ByteArray {
-        return ktor.get("api/v1/books/$bookId/thumbnail") {
+    override suspend fun getDefaultThumbnail(bookId: KomgaBookId): ByteArray? {
+        return try {
+            return ktor.get("api/v1/books/$bookId/thumbnail") {
+                accept(ContentType.Any)
+            }.body()
+        } catch (e: ClientRequestException) {
+            if (e.response.status == HttpStatusCode.NotFound) null
+            else throw e
+        }
+    }
+
+    override suspend fun getThumbnail(
+        bookId: KomgaBookId,
+        thumbnailId: KomgaThumbnailId
+    ): ByteArray {
+        return ktor.get("api/v1/books/$bookId/thumbnails/$thumbnailId") {
             accept(ContentType.Any)
         }.body()
     }
 
-    override suspend fun getBookThumbnails(bookId: KomgaBookId): List<KomgaBookThumbnail> {
+    override suspend fun getThumbnails(bookId: KomgaBookId): List<KomgaBookThumbnail> {
         return ktor.get("api/v1/books/$bookId/thumbnails").body()
     }
 
-    override suspend fun uploadBookThumbnail(
+    override suspend fun uploadThumbnail(
         bookId: KomgaBookId,
         file: ByteArray,
         filename: String,
@@ -192,11 +179,11 @@ class HttpBookClient(private val ktor: HttpClient) : KomgaBookClient {
         }.body()
     }
 
-    override suspend fun selectBookThumbnail(bookId: KomgaBookId, thumbnailId: KomgaThumbnailId) {
+    override suspend fun selectThumbnail(bookId: KomgaBookId, thumbnailId: KomgaThumbnailId) {
         ktor.put("api/v1/books/$bookId/thumbnails/$thumbnailId/selected")
     }
 
-    override suspend fun deleteBookThumbnail(bookId: KomgaBookId, thumbnailId: KomgaThumbnailId) {
+    override suspend fun deleteThumbnail(bookId: KomgaBookId, thumbnailId: KomgaThumbnailId) {
         ktor.delete("api/v1/books/$bookId/thumbnails/$thumbnailId")
     }
 
@@ -204,16 +191,17 @@ class HttpBookClient(private val ktor: HttpClient) : KomgaBookClient {
         return ktor.get("api/v1/books/$bookId/readlists").body()
     }
 
-    override suspend fun getBookPage(bookId: KomgaBookId, page: Int): ByteArray {
+    override suspend fun getPage(bookId: KomgaBookId, page: Int): ByteArray {
         return ktor.get("api/v1/books/${bookId}/pages/$page").body()
     }
 
-    override suspend fun <T> streamBookPage(
+    override suspend fun getPageThumbnail(
         bookId: KomgaBookId,
-        page: Int,
-        block: suspend (response: HttpResponse) -> T
-    ): T {
-        return ktor.prepareGet("api/v1/books/${bookId}/pages/$page").execute { block(it) }
+        page: Int
+    ): ByteArray {
+        return ktor.get("api/v1/books/${bookId}/pages/$page/thumbnail") {
+            accept(ContentType.Any)
+        }.body()
     }
 
     override suspend fun getReadiumProgression(bookId: KomgaBookId): R2Progression? {
@@ -239,6 +227,18 @@ class HttpBookClient(private val ktor: HttpClient) : KomgaBookClient {
 
     override suspend fun getWebPubManifest(bookId: KomgaBookId): WPPublication {
         return ktor.get("api/v1/books/${bookId}/manifest") {
+            accept(ContentType.Any)
+        }.body()
+    }
+
+    override suspend fun getBookFile(bookId: KomgaBookId, block: suspend (response: HttpResponse) -> Unit) {
+        ktor.prepareGet("api/v1/books/${bookId}/file") {
+            accept(ContentType.Any)
+        }.execute(block)
+    }
+
+    override suspend fun getBookEpubResource(bookId: KomgaBookId, resourceName: String) : ByteArray{
+        return ktor.get("api/v1/books/${bookId}/resource/$resourceName") {
             accept(ContentType.Any)
         }.body()
     }

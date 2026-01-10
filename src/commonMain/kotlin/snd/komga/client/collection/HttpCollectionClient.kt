@@ -2,6 +2,7 @@ package snd.komga.client.collection
 
 import io.ktor.client.*
 import io.ktor.client.call.*
+import io.ktor.client.plugins.*
 import io.ktor.client.request.*
 import io.ktor.client.request.forms.*
 import io.ktor.http.*
@@ -77,11 +78,31 @@ class HttpCollectionClient internal constructor(private val ktor: HttpClient) : 
 
     }
 
-    override suspend fun getCollectionThumbnails(collectionId: KomgaCollectionId): List<KomgaCollectionThumbnail> {
+    override suspend fun getDefaultThumbnail(collectionId: KomgaCollectionId): ByteArray? {
+        return try {
+            return ktor.get("api/v1/collections/$collectionId/thumbnail") {
+                accept(ContentType.Any)
+            }.body()
+        } catch (e: ClientRequestException) {
+            if (e.response.status == HttpStatusCode.NotFound) null
+            else throw e
+        }
+    }
+
+    override suspend fun getThumbnail(
+        collectionId: KomgaCollectionId,
+        thumbnailId: KomgaThumbnailId
+    ): ByteArray {
+        return ktor.get("api/v1/collections/$collectionId/thumbnails/$thumbnailId") {
+            accept(ContentType.Any)
+        }.body()
+    }
+
+    override suspend fun getThumbnails(collectionId: KomgaCollectionId): List<KomgaCollectionThumbnail> {
         return ktor.get("api/v1/collections/$collectionId/thumbnails").body()
     }
 
-    override suspend fun uploadCollectionThumbnail(
+    override suspend fun uploadThumbnail(
         collectionId: KomgaCollectionId,
         file: ByteArray,
         filename: String,
@@ -100,11 +121,11 @@ class HttpCollectionClient internal constructor(private val ktor: HttpClient) : 
         }.body()
     }
 
-    override suspend fun selectCollectionThumbnail(collectionId: KomgaCollectionId, thumbnailId: KomgaThumbnailId) {
+    override suspend fun selectThumbnail(collectionId: KomgaCollectionId, thumbnailId: KomgaThumbnailId) {
         ktor.put("api/v1/collections/$collectionId/thumbnails/$thumbnailId/selected")
     }
 
-    override suspend fun deleteCollectionThumbnail(collectionId: KomgaCollectionId, thumbnailId: KomgaThumbnailId) {
+    override suspend fun deleteThumbnail(collectionId: KomgaCollectionId, thumbnailId: KomgaThumbnailId) {
         ktor.delete("api/v1/collections/$collectionId/thumbnails/$thumbnailId")
     }
 

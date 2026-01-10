@@ -16,10 +16,6 @@ class KomgaSearchCondition {
 
     @Serializable
     sealed interface SeriesCondition
-
-    @Serializable
-    data object NoopCondition : BookCondition, SeriesCondition
-
     @Serializable
     @SerialName("AnyOfBook")
     data class AnyOfBook(

@@ -13,7 +13,7 @@ interface KomgaReferentialClient {
     suspend fun getAuthors(
         search: String? = null,
         role: String? = null,
-        libraryId: KomgaLibraryId? = null,
+        libraryIds: List<KomgaLibraryId> = emptyList(),
         collectionId: KomgaCollectionId? = null,
         seriesId: KomgaSeriesId? = null,
         readListId: KomgaReadListId? = null,
@@ -25,23 +25,24 @@ interface KomgaReferentialClient {
     suspend fun getAuthorsRoles(): List<String>
 
     suspend fun getGenres(
-        libraryId: KomgaLibraryId? = null,
+        libraryIds: List<KomgaLibraryId> = emptyList(),
         collectionId: KomgaCollectionId? = null
     ): List<String>
 
     suspend fun getSharingLabels(
-        libraryId: KomgaLibraryId? = null,
+        libraryIds: List<KomgaLibraryId> = emptyList(),
         collectionId: KomgaCollectionId? = null
     ): List<String>
 
     suspend fun getTags(
-        libraryId: KomgaLibraryId? = null,
+        libraryIds: List<KomgaLibraryId> = emptyList(),
         collectionId: KomgaCollectionId? = null
     ): List<String>
 
     suspend fun getBookTags(
         seriesId: KomgaSeriesId? = null,
-        readListId: KomgaReadListId? = null
+        readListId: KomgaReadListId? = null,
+        libraryIds: List<KomgaLibraryId> = emptyList()
     ): List<String>
 
     suspend fun getSeriesTags(
@@ -50,22 +51,22 @@ interface KomgaReferentialClient {
     ): List<String>
 
     suspend fun getLanguages(
-        libraryId: KomgaLibraryId? = null,
+        libraryIds: List<KomgaLibraryId> = emptyList(),
         collectionId: KomgaCollectionId? = null
     ): List<String>
 
     suspend fun getPublishers(
-        libraryId: KomgaLibraryId? = null,
+        libraryIds: List<KomgaLibraryId> = emptyList(),
         collectionId: KomgaCollectionId? = null
     ): List<String>
 
     suspend fun getAgeRatings(
-        libraryId: KomgaLibraryId? = null,
+        libraryIds: List<KomgaLibraryId> = emptyList(),
         collectionId: KomgaCollectionId? = null
     ): List<String>
 
     suspend fun getSeriesReleaseDates(
-        libraryId: KomgaLibraryId? = null,
+        libraryIds: List<KomgaLibraryId> = emptyList(),
         collectionId: KomgaCollectionId? = null
     ): List<String>
 }

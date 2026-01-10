@@ -60,18 +60,20 @@ interface KomgaSeriesClient {
     suspend fun refreshMetadata(seriesId: KomgaSeriesId)
     suspend fun markAsRead(seriesId: KomgaSeriesId)
     suspend fun markAsUnread(seriesId: KomgaSeriesId)
-    suspend fun deleteSeries(seriesId: KomgaSeriesId)
-    suspend fun updateSeries(seriesId: KomgaSeriesId, request: KomgaSeriesMetadataUpdateRequest)
-    suspend fun getSeriesDefaultThumbnail(seriesId: KomgaSeriesId): ByteArray
-    suspend fun getSeriesThumbnails(seriesId: KomgaSeriesId): List<KomgaSeriesThumbnail>
-    suspend fun uploadSeriesThumbnail(
+    suspend fun delete(seriesId: KomgaSeriesId)
+    suspend fun update(seriesId: KomgaSeriesId, request: KomgaSeriesMetadataUpdateRequest)
+    suspend fun getDefaultThumbnail(seriesId: KomgaSeriesId): ByteArray?
+    suspend fun getThumbnail(seriesId: KomgaSeriesId, thumbnailId: KomgaThumbnailId): ByteArray
+    suspend fun getThumbnails(seriesId: KomgaSeriesId): List<KomgaSeriesThumbnail>
+
+    suspend fun uploadThumbnail(
         seriesId: KomgaSeriesId,
         file: ByteArray,
         filename: String = "",
         selected: Boolean = true
     ): KomgaSeriesThumbnail
 
-    suspend fun selectSeriesThumbnail(seriesId: KomgaSeriesId, thumbnailId: KomgaThumbnailId)
-    suspend fun deleteSeriesThumbnail(seriesId: KomgaSeriesId, thumbnailId: KomgaThumbnailId)
+    suspend fun selectThumbnail(seriesId: KomgaSeriesId, thumbnailId: KomgaThumbnailId)
+    suspend fun deleteThumbnail(seriesId: KomgaSeriesId, thumbnailId: KomgaThumbnailId)
     suspend fun getAllCollectionsBySeries(seriesId: KomgaSeriesId): List<KomgaCollection>
 }

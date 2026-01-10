@@ -1,29 +1,16 @@
 package snd.komga.client.series
 
-import io.ktor.client.HttpClient
-import io.ktor.client.call.body
-import io.ktor.client.request.accept
-import io.ktor.client.request.delete
-import io.ktor.client.request.forms.MultiPartFormDataContent
-import io.ktor.client.request.forms.formData
-import io.ktor.client.request.get
-import io.ktor.client.request.patch
-import io.ktor.client.request.post
-import io.ktor.client.request.put
-import io.ktor.client.request.setBody
-import io.ktor.http.ContentType
-import io.ktor.http.Headers
-import io.ktor.http.HttpHeaders
-import io.ktor.http.contentType
+import io.ktor.client.*
+import io.ktor.client.call.*
+import io.ktor.client.plugins.*
+import io.ktor.client.request.*
+import io.ktor.client.request.forms.*
+import io.ktor.http.*
 import snd.komga.client.book.KomgaBook
 import snd.komga.client.book.KomgaMediaStatus
 import snd.komga.client.book.KomgaReadStatus
 import snd.komga.client.collection.KomgaCollection
-import snd.komga.client.common.KomgaAuthor
-import snd.komga.client.common.KomgaPageRequest
-import snd.komga.client.common.KomgaThumbnailId
-import snd.komga.client.common.Page
-import snd.komga.client.common.toParams
+import snd.komga.client.common.*
 import snd.komga.client.library.KomgaLibraryId
 import snd.komga.client.search.SeriesConditionBuilder
 
@@ -192,28 +179,39 @@ class HttpSeriesClient(private val ktor: HttpClient) : KomgaSeriesClient {
         ktor.delete("api/v1/series/$seriesId/read-progress")
     }
 
-    override suspend fun deleteSeries(seriesId: KomgaSeriesId) {
+    override suspend fun delete(seriesId: KomgaSeriesId) {
         ktor.delete("api/v1/series/$seriesId/file")
     }
 
-    override suspend fun updateSeries(seriesId: KomgaSeriesId, request: KomgaSeriesMetadataUpdateRequest) {
+    override suspend fun update(seriesId: KomgaSeriesId, request: KomgaSeriesMetadataUpdateRequest) {
         ktor.patch("api/v1/series/$seriesId/metadata") {
             contentType(ContentType.Application.Json)
             setBody(request)
         }
     }
 
-    override suspend fun getSeriesDefaultThumbnail(seriesId: KomgaSeriesId): ByteArray {
-        return ktor.get("api/v1/series/$seriesId/thumbnail") {
+    override suspend fun getDefaultThumbnail(seriesId: KomgaSeriesId): ByteArray? {
+        return try {
+            ktor.get("api/v1/series/$seriesId/thumbnail") {
+                accept(ContentType.Any)
+            }.body()
+        } catch (e: ClientRequestException) {
+            if (e.response.status == HttpStatusCode.NotFound) null
+            else throw e
+        }
+    }
+
+    override suspend fun getThumbnail(seriesId: KomgaSeriesId, thumbnailId: KomgaThumbnailId): ByteArray {
+        return ktor.get("api/v1/series/$seriesId/thumbnails/$thumbnailId") {
             accept(ContentType.Any)
         }.body()
     }
 
-    override suspend fun getSeriesThumbnails(seriesId: KomgaSeriesId): List<KomgaSeriesThumbnail> {
+    override suspend fun getThumbnails(seriesId: KomgaSeriesId): List<KomgaSeriesThumbnail> {
         return ktor.get("api/v1/series/$seriesId/thumbnails").body()
     }
 
-    override suspend fun uploadSeriesThumbnail(
+    override suspend fun uploadThumbnail(
         seriesId: KomgaSeriesId,
         file: ByteArray,
         filename: String,
@@ -232,11 +230,11 @@ class HttpSeriesClient(private val ktor: HttpClient) : KomgaSeriesClient {
         }.body()
     }
 
-    override suspend fun selectSeriesThumbnail(seriesId: KomgaSeriesId, thumbnailId: KomgaThumbnailId) {
+    override suspend fun selectThumbnail(seriesId: KomgaSeriesId, thumbnailId: KomgaThumbnailId) {
         ktor.put("api/v1/series/$seriesId/thumbnails/$thumbnailId/selected")
     }
 
-    override suspend fun deleteSeriesThumbnail(seriesId: KomgaSeriesId, thumbnailId: KomgaThumbnailId) {
+    override suspend fun deleteThumbnail(seriesId: KomgaSeriesId, thumbnailId: KomgaThumbnailId) {
         ktor.delete("api/v1/series/$seriesId/thumbnails/$thumbnailId")
     }
 

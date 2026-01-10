@@ -16,7 +16,7 @@ class HttpReferentialClient internal constructor(private val ktor: HttpClient) :
     override suspend fun getAuthors(
         search: String?,
         role: String?,
-        libraryId: KomgaLibraryId?,
+        libraryIds: List<KomgaLibraryId>,
         collectionId: KomgaCollectionId?,
         seriesId: KomgaSeriesId?,
         readListId: KomgaReadListId?,
@@ -26,7 +26,7 @@ class HttpReferentialClient internal constructor(private val ktor: HttpClient) :
             url.parameters.apply {
                 search?.let { append("search", it) }
                 role?.let { append("role", it) }
-                libraryId?.let { append("library_id", it.value) }
+                if (libraryIds.isNotEmpty()) append("library_id", libraryIds.joinToString(",") { it.value })
                 collectionId?.let { append("collection_id", it.value) }
                 seriesId?.let { append("series_id", it.value) }
                 readListId?.let { append("readlist_id", it.value) }
@@ -48,36 +48,36 @@ class HttpReferentialClient internal constructor(private val ktor: HttpClient) :
     }
 
     override suspend fun getGenres(
-        libraryId: KomgaLibraryId?,
+        libraryIds: List<KomgaLibraryId>,
         collectionId: KomgaCollectionId?,
     ): List<String> {
         return ktor.get("api/v1/genres") {
             url.parameters.apply {
-                libraryId?.let { append("library_id", it.value) }
+                if (libraryIds.isNotEmpty()) append("library_id", libraryIds.joinToString(",") { it.value })
                 collectionId?.let { append("collection_id", it.value) }
             }
         }.body()
     }
 
     override suspend fun getSharingLabels(
-        libraryId: KomgaLibraryId?,
+        libraryIds: List<KomgaLibraryId>,
         collectionId: KomgaCollectionId?
     ): List<String> {
         return ktor.get("api/v1/sharing-labels") {
             url.parameters.apply {
-                libraryId?.let { append("library_id", it.value) }
+                if (libraryIds.isNotEmpty()) append("library_id", libraryIds.joinToString(",") { it.value })
                 collectionId?.let { append("collection_id", it.value) }
             }
         }.body()
     }
 
     override suspend fun getTags(
-        libraryId: KomgaLibraryId?,
+        libraryIds: List<KomgaLibraryId>,
         collectionId: KomgaCollectionId?
     ): List<String> {
         return ktor.get("api/v1/tags") {
             url.parameters.apply {
-                libraryId?.let { append("library_id", it.value) }
+                if (libraryIds.isNotEmpty()) append("library_id", libraryIds.joinToString(",") { it.value })
                 collectionId?.let { append("collection_id", it.value) }
             }
         }.body()
@@ -85,12 +85,14 @@ class HttpReferentialClient internal constructor(private val ktor: HttpClient) :
 
     override suspend fun getBookTags(
         seriesId: KomgaSeriesId?,
-        readListId: KomgaReadListId?
+        readListId: KomgaReadListId?,
+        libraryIds: List<KomgaLibraryId>
     ): List<String> {
         return ktor.get("api/v1/tags/book") {
             url.parameters.apply {
                 seriesId?.let { append("series_id", it.value) }
                 readListId?.let { append("readlist_id", it.value) }
+                if (libraryIds.isNotEmpty()) append("library_id", libraryIds.joinToString(",") { it.value })
             }
         }.body()
     }
@@ -108,48 +110,48 @@ class HttpReferentialClient internal constructor(private val ktor: HttpClient) :
     }
 
     override suspend fun getLanguages(
-        libraryId: KomgaLibraryId?,
+        libraryIds: List<KomgaLibraryId>,
         collectionId: KomgaCollectionId?
     ): List<String> {
         return ktor.get("api/v1/languages") {
             url.parameters.apply {
-                libraryId?.let { append("library_id", it.value) }
+                if (libraryIds.isNotEmpty()) append("library_id", libraryIds.joinToString(",") { it.value })
                 collectionId?.let { append("collection_id", it.value) }
             }
         }.body()
     }
 
     override suspend fun getPublishers(
-        libraryId: KomgaLibraryId?,
+        libraryIds: List<KomgaLibraryId>,
         collectionId: KomgaCollectionId?
     ): List<String> {
         return ktor.get("api/v1/publishers") {
             url.parameters.apply {
-                libraryId?.let { append("library_id", it.value) }
+                if (libraryIds.isNotEmpty()) append("library_id", libraryIds.joinToString(",") { it.value })
                 collectionId?.let { append("collection_id", it.value) }
             }
         }.body()
     }
 
     override suspend fun getAgeRatings(
-        libraryId: KomgaLibraryId?,
+        libraryIds: List<KomgaLibraryId>,
         collectionId: KomgaCollectionId?
     ): List<String> {
         return ktor.get("api/v1/age-ratings") {
             url.parameters.apply {
-                libraryId?.let { append("library_id", it.value) }
+                if (libraryIds.isNotEmpty()) append("library_id", libraryIds.joinToString(",") { it.value })
                 collectionId?.let { append("collection_id", it.value) }
             }
         }.body()
     }
 
     override suspend fun getSeriesReleaseDates(
-        libraryId: KomgaLibraryId?,
+        libraryIds: List<KomgaLibraryId>,
         collectionId: KomgaCollectionId?
     ): List<String> {
         return ktor.get("api/v1/series/release-dates") {
             url.parameters.apply {
-                libraryId?.let { append("library_id", it.value) }
+                if (libraryIds.isNotEmpty()) append("library_id", libraryIds.joinToString(",") { it.value })
                 collectionId?.let { append("collection_id", it.value) }
             }
         }.body()

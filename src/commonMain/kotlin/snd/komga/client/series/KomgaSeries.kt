@@ -31,6 +31,9 @@ data class KomgaSeries(
     val deleted: Boolean,
     val oneshot: Boolean,
     val booksMetadata: KomgaSeriesBookMetadata,
+    val created: Instant,
+    val lastModified: Instant,
+    val fileLastModified: Instant,
 )
 
 @Serializable

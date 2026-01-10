@@ -9,7 +9,7 @@ plugins {
 }
 
 group = "io.github.snd-r"
-version = "0.9.0"
+version = "0.10.0"
 
 kotlin {
     jvmToolchain(17)
@@ -40,19 +40,6 @@ kotlin {
             implementation(libs.ktor.client.encoding)
             implementation(libs.ktor.serialization.kotlinx.json)
             implementation(libs.ktor.sse)
-        }
-
-        jvmMain.dependencies {
-            implementation(libs.okhttp)
-            implementation(libs.okhttp.sse)
-        }
-
-        androidMain.dependencies {
-            implementation(libs.okhttp)
-            implementation(libs.okhttp.sse)
-        }
-        wasmJsMain.dependencies {
-            implementation(libs.kotlinx.browser)
         }
     }
 

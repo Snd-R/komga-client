@@ -2,6 +2,7 @@ package snd.komga.client.readlist
 
 import io.ktor.client.*
 import io.ktor.client.call.*
+import io.ktor.client.plugins.*
 import io.ktor.client.request.*
 import io.ktor.client.request.forms.*
 import io.ktor.http.*
@@ -70,11 +71,31 @@ class HttpReadListClient internal constructor(private val ktor: HttpClient) : Ko
         }.body()
     }
 
-    override suspend fun getReadListThumbnails(readListId: KomgaReadListId): List<KomgaReadListThumbnail> {
+    override suspend fun getDefaultThumbnail(readListId: KomgaReadListId): ByteArray? {
+        return try {
+            return ktor.get("api/v1/readlists/$readListId/thumbnail") {
+                accept(ContentType.Any)
+            }.body()
+        } catch (e: ClientRequestException) {
+            if (e.response.status == HttpStatusCode.NotFound) null
+            else throw e
+        }
+    }
+
+    override suspend fun getThumbnail(
+        readListId: KomgaReadListId,
+        thumbnailId: KomgaThumbnailId
+    ): ByteArray {
+        return ktor.get("api/v1/readlists/$readListId/thumbnails/$thumbnailId") {
+            accept(ContentType.Any)
+        }.body()
+    }
+
+    override suspend fun getThumbnails(readListId: KomgaReadListId): List<KomgaReadListThumbnail> {
         return ktor.get("api/v1/readlists/$readListId/thumbnails").body()
     }
 
-    override suspend fun uploadReadListThumbnail(
+    override suspend fun uploadThumbnail(
         readListId: KomgaReadListId,
         file: ByteArray,
         filename: String,
@@ -93,19 +114,29 @@ class HttpReadListClient internal constructor(private val ktor: HttpClient) : Ko
         }.body()
     }
 
-    override suspend fun selectReadListThumbnail(readListId: KomgaReadListId, thumbnailId: KomgaThumbnailId) {
+    override suspend fun selectThumbnail(readListId: KomgaReadListId, thumbnailId: KomgaThumbnailId) {
         ktor.put("api/v1/readlists/$readListId/thumbnails/$thumbnailId/selected")
     }
 
-    override suspend fun deleteReadListThumbnail(readListId: KomgaReadListId, thumbnailId: KomgaThumbnailId) {
+    override suspend fun deleteThumbnail(readListId: KomgaReadListId, thumbnailId: KomgaThumbnailId) {
         ktor.delete("api/v1/readlists/$readListId/thumbnails/$thumbnailId")
     }
 
-    override suspend fun getBookSiblingNext(readListId: KomgaReadListId, bookId: KomgaBookId): KomgaBook {
-        return ktor.get("api/v1/readlists/$readListId/books/$bookId/next").body()
+    override suspend fun getBookSiblingNext(readListId: KomgaReadListId, bookId: KomgaBookId): KomgaBook? {
+        return try {
+            ktor.get("api/v1/readlists/$readListId/books/$bookId/next").body()
+        } catch (e: ClientRequestException) {
+            if (e.response.status == HttpStatusCode.NotFound) null
+            else throw e
+        }
     }
 
-    override suspend fun getBookSiblingPrevious(readListId: KomgaReadListId, bookId: KomgaBookId): KomgaBook {
-        return ktor.get("api/v1/readlists/$readListId/books/$bookId/previous").body()
+    override suspend fun getBookSiblingPrevious(readListId: KomgaReadListId, bookId: KomgaBookId): KomgaBook? {
+        return try {
+            ktor.get("api/v1/readlists/$readListId/books/$bookId/previous").body()
+        } catch (e: ClientRequestException) {
+            if (e.response.status == HttpStatusCode.NotFound) null
+            else throw e
+        }
     }
 }

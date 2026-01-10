@@ -6,6 +6,8 @@ import io.ktor.client.plugins.auth.*
 import io.ktor.client.plugins.auth.providers.*
 import io.ktor.client.plugins.contentnegotiation.*
 import io.ktor.client.plugins.cookies.*
+import io.ktor.client.plugins.sse.*
+import io.ktor.client.request.*
 import io.ktor.http.*
 import io.ktor.serialization.kotlinx.json.*
 import kotlinx.serialization.json.Json
@@ -20,8 +22,10 @@ import snd.komga.client.referential.HttpReferentialClient
 import snd.komga.client.series.HttpSeriesClient
 import snd.komga.client.settings.HttpSettingsClient
 import snd.komga.client.sse.KomgaSSESession
+import snd.komga.client.sse.KtorKomgaSSESession
 import snd.komga.client.task.HttpTaskClient
 import snd.komga.client.user.HttpUserClient
+import kotlin.time.Duration.Companion.seconds
 
 class KomgaClientFactory private constructor(
     private val builder: Builder
@@ -65,6 +69,10 @@ class KomgaClientFactory private constructor(
             if (useragent != null) {
                 install(UserAgent) { agent = useragent }
             }
+            install(SSE) {
+                maxReconnectionAttempts = Int.MAX_VALUE
+                reconnectionTime = 10.seconds
+            }
 
             expectSuccess = true
         }
@@ -84,20 +92,10 @@ class KomgaClientFactory private constructor(
     fun referentialClient() = HttpReferentialClient(ktor)
     fun ktor() = ktor
 
-    //FIXME ktor sse session implementation does NOT terminate sse connection on session context cancellation
-    // using custom implementation as a workaround
     suspend fun sseSession(): KomgaSSESession {
-        val authCookie = ktor.cookies(Url(baseUrl()))
-            .find { it.name == "SESSION" || it.name == "KOMGA-SESSION" }
-            ?.let { renderCookieHeader(it) }
-
-        return getSseSession(
-            json = json,
-            baseUrl = baseUrl().buildString(),
-            username = builder.username,
-            password = builder.password,
-            useragent = builder.useragent,
-            authCookie = authCookie
+        return KtorKomgaSSESession(
+            ktorSession = ktor.sseSession { url("sse/v1/events") },
+            json = json
         )
     }
 
@@ -145,12 +143,3 @@ class KomgaClientFactory private constructor(
 
     }
 }
-
-internal expect suspend fun getSseSession(
-    json: Json,
-    baseUrl: String,
-    username: String?,
-    password: String?,
-    useragent: String?,
-    authCookie: String?
-): KomgaSSESession

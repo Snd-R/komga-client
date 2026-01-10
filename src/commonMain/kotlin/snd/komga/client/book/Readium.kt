@@ -29,8 +29,9 @@ data class R2Locator(
     val href: String,
     val type: String,
     val title: String? = null,
-    val locations: R2Location,
-    val text: R2LocatorText? = null
+    val locations: R2Location? = null,
+    val text: R2LocatorText? = null,
+    val koboSpan: String? = null,
 )
 
 @Serializable

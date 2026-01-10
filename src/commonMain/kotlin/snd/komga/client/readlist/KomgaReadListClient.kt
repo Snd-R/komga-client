@@ -25,17 +25,19 @@ interface KomgaReadListClient {
         pageRequest: KomgaPageRequest? = null,
     ): Page<KomgaBook>
 
-    suspend fun getReadListThumbnails(readListId: KomgaReadListId): List<KomgaReadListThumbnail>
-    suspend fun uploadReadListThumbnail(
+    suspend fun getDefaultThumbnail(readListId: KomgaReadListId): ByteArray?
+    suspend fun getThumbnail(readListId: KomgaReadListId, thumbnailId: KomgaThumbnailId): ByteArray
+    suspend fun getThumbnails(readListId: KomgaReadListId): List<KomgaReadListThumbnail>
+    suspend fun uploadThumbnail(
         readListId: KomgaReadListId,
         file: ByteArray,
         filename: String = "",
         selected: Boolean = true
     ): KomgaReadListThumbnail
 
-    suspend fun selectReadListThumbnail(readListId: KomgaReadListId, thumbnailId: KomgaThumbnailId)
-    suspend fun deleteReadListThumbnail(readListId: KomgaReadListId, thumbnailId: KomgaThumbnailId)
+    suspend fun selectThumbnail(readListId: KomgaReadListId, thumbnailId: KomgaThumbnailId)
+    suspend fun deleteThumbnail(readListId: KomgaReadListId, thumbnailId: KomgaThumbnailId)
 
-    suspend fun getBookSiblingNext(readListId: KomgaReadListId, bookId: KomgaBookId): KomgaBook
-    suspend fun getBookSiblingPrevious(readListId: KomgaReadListId, bookId: KomgaBookId): KomgaBook
+    suspend fun getBookSiblingNext(readListId: KomgaReadListId, bookId: KomgaBookId): KomgaBook?
+    suspend fun getBookSiblingPrevious(readListId: KomgaReadListId, bookId: KomgaBookId): KomgaBook?
 }
