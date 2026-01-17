@@ -26,8 +26,8 @@ data class R2LocatorText(
 
 @Serializable
 data class R2Locator(
-    val href: String,
-    val type: String,
+    val href: String = "",
+    val type: String = "",
     val title: String? = null,
     val locations: R2Location? = null,
     val text: R2LocatorText? = null,

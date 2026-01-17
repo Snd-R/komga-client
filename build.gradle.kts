@@ -9,7 +9,7 @@ plugins {
 }
 
 group = "io.github.snd-r"
-version = "0.10.1"
+version = "0.10.2"
 
 kotlin {
     androidTarget {
