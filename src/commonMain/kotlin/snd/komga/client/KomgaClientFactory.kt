@@ -94,7 +94,14 @@ class KomgaClientFactory private constructor(
 
     suspend fun sseSession(): KomgaSSESession {
         return KtorKomgaSSESession(
-            ktorSession = ktor.sseSession { url("sse/v1/events") },
+            ktorSession = ktor.sseSession {
+                url("sse/v1/events")
+                timeout {
+                    requestTimeoutMillis = HttpTimeoutConfig.INFINITE_TIMEOUT_MS
+                    socketTimeoutMillis= HttpTimeoutConfig.INFINITE_TIMEOUT_MS
+                    connectTimeoutMillis = 30_000
+                }
+            },
             json = json
         )
     }

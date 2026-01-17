@@ -9,10 +9,9 @@ plugins {
 }
 
 group = "io.github.snd-r"
-version = "0.10.0"
+version = "0.10.1"
 
 kotlin {
-    jvmToolchain(17)
     androidTarget {
         compilerOptions { jvmTarget.set(JvmTarget.JVM_17) }
         publishLibraryVariants("release")
